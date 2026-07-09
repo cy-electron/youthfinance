@@ -6,9 +6,12 @@ __pycache__/
 *$py.class
 
 # Virtual Environment
+youthfinance/venv
 venv/
 env/
 .venv/
+backend/venv/
+backend/.env
 
 # Environment Variables
 .env
