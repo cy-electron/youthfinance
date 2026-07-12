@@ -1,49 +1,59 @@
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from marshmallow import ValidationError
-from app.models.user import User
 
 from app.auth.auth_schema import RegisterSchema, LoginSchema
 from app.auth.auth_service import AuthService
 
-auth_bp = Blueprint("auth", __name__, url_prefix="/api/auth")
+from app.common.responses import success_response
+from app.common.validators import validate_schema
+from app.common.exceptions import NotFoundException
+
+from app.models.user import User
+
+
+auth_bp = Blueprint(
+    "auth",
+    __name__,
+    url_prefix="/api/auth"
+)
 
 register_schema = RegisterSchema()
+login_schema = LoginSchema()
 
 
 @auth_bp.route("/register", methods=["POST"])
 def register():
 
-    try:
-        data = register_schema.load(request.get_json())
+    data = validate_schema(
+        register_schema,
+        request.get_json()
+    )
 
-    except ValidationError as err:
-        return {
-            "success": False,
-            "errors": err.messages
-        }, 400
+    result = AuthService.register_user(data)
 
-    response, status = AuthService.register_user(data)
-
-    return response, status
+    return success_response(
+        message=result["message"],
+        status_code=201
+    )
 
 
-login_schema = LoginSchema()
 @auth_bp.route("/login", methods=["POST"])
 def login():
 
-    try:
-        data = login_schema.load(request.get_json())
+    data = validate_schema(
+        login_schema,
+        request.get_json()
+    )
 
-    except ValidationError as err:
-        return {
-            "success": False,
-            "errors": err.messages
-        }, 400
+    result = AuthService.login_user(data)
 
-    response, status = AuthService.login_user(data)
+    return success_response(
+        message=result["message"],
+        data={
+            "access_token": result["access_token"]
+        }
+    )
 
-    return response, status
 
 @auth_bp.route("/profile", methods=["GET"])
 @jwt_required()
@@ -54,17 +64,13 @@ def profile():
     user = User.query.get(user_id)
 
     if not user:
-        return {
-            "success": False,
-            "message": "User not found."
-        }, 404
+        raise NotFoundException("User not found.")
 
-    return {
-        "success": True,
-        "data": {
-            "id": str(user.id),
+    return success_response(
+        data={
+            "id": user.id,
             "full_name": user.full_name,
             "email": user.email,
             "is_active": user.is_active
         }
-    }, 200
+    )
