@@ -1,3 +1,1 @@
-from .user import User
-
 from app.income.income_model import Income

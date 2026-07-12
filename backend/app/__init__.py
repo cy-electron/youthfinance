@@ -1,10 +1,13 @@
 from flask import Flask
 from dotenv import load_dotenv
 import os
+import app.models
 from sqlalchemy import text
-from app.config.config import Config
-from app.models import User
+from app.config.config import Config 
 from app.auth.auth_routes import auth_bp
+from app.income.income_routes import income_bp
+
+from app.common.error_handlers import register_error_handlers
 from app.extensions import (
     db,
     migrate,
@@ -26,6 +29,8 @@ def create_app():
     bcrypt.init_app(app)
     cors.init_app(app)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(income_bp)
+    print(app.url_map)
     
     @app.route("/")
     def home():
@@ -45,6 +50,10 @@ def create_app():
                 "status": "Connection Failed",
                 "error": str(e)
             }, 500
+        
+
+   
+    register_error_handlers(app)
     
     return app
 
