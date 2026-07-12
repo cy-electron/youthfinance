@@ -6,6 +6,9 @@ from sqlalchemy import text
 from app.config.config import Config 
 from app.auth.auth_routes import auth_bp
 from app.income.income_routes import income_bp
+from app.expense.expense_routes import expense_bp
+from app.budget.budget_routes import budget_bp
+from app.goal.goal_routes import goal_bp
 
 from app.common.error_handlers import register_error_handlers
 from app.extensions import (
@@ -30,7 +33,10 @@ def create_app():
     cors.init_app(app)
     app.register_blueprint(auth_bp)
     app.register_blueprint(income_bp)
-    print(app.url_map)
+    app.register_blueprint(expense_bp)
+    app.register_blueprint(budget_bp)
+    app.register_blueprint(goal_bp)
+
     
     @app.route("/")
     def home():
