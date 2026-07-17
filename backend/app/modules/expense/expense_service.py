@@ -1,7 +1,7 @@
 from flask_jwt_extended import get_jwt_identity
 
 from app.extensions import db
-from app.expense.expense_model import Expense
+from app.modules.expense.expense_model import Expense
 from app.common.exceptions import NotFoundException
 
 

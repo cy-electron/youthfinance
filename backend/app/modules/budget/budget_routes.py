@@ -3,11 +3,11 @@ from flask_jwt_extended import jwt_required
 
 from app.common.responses import success_response
 from app.common.validators import validate_schema
-from app.budget.budget_schema import (
+from app.modules.budget.budget_schema import (
     CreateBudgetSchema,
     UpdateBudgetSchema,
 )
-from app.budget.budget_service import BudgetService
+from app.modules.budget.budget_service import BudgetService
 
 budget_bp = Blueprint(
     "budget",
@@ -46,8 +46,10 @@ def get_budgets():
             "id": budget.id,
             "category": budget.category,
             "amount": float(budget.amount),
-            "start_date": budget.start_date.isoformat(),
-            "end_date": budget.end_date.isoformat()
+            "month": budget.month,
+            "year": budget.year,
+            
+            
         })
 
     return success_response(data=data)
@@ -60,14 +62,14 @@ def get_budget(budget_id):
     budget = BudgetService.get_budget(budget_id)
 
     return success_response(
-        data={
-            "id": budget.id,
-            "category": budget.category,
-            "amount": float(budget.amount),
-            "start_date": budget.start_date.isoformat(),
-            "end_date": budget.end_date.isoformat()
-        }
-    )
+      data={
+    "id": budget.id,
+    "category": budget.category,
+    "amount": float(budget.amount),
+    "month": budget.month,
+    "year": budget.year,
+    
+})
 
 
 @budget_bp.route("/<int:budget_id>", methods=["PUT"])

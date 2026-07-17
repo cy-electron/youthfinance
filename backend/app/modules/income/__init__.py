@@ -1,0 +1,1 @@
+from app.modules.income.income_model import Income

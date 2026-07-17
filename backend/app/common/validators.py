@@ -1,9 +1,14 @@
-from marshmallow import ValidationError
+from marshmallow import Schema, ValidationError
+from app.common.exceptions import ValidationException
 
 
 def validate_schema(schema, data):
-    """
-    Validate request data using a Marshmallow schema.
-    Returns validated data or raises ValidationError.
-    """
-    return schema.load(data)
+    try:
+        # If it's a class, instantiate it
+        if isinstance(schema, type):
+            schema = schema()
+
+        return schema.load(data)
+
+    except ValidationError as err:
+        raise ValidationException(err.messages)

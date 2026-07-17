@@ -1,8 +1,8 @@
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from app.auth.auth_schema import RegisterSchema, LoginSchema
-from app.auth.auth_service import AuthService
+from app.modules.auth.auth_schema import RegisterSchema, LoginSchema
+from app.modules.auth.auth_service import AuthService
 
 from app.common.responses import success_response
 from app.common.validators import validate_schema

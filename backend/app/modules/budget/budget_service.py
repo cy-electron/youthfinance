@@ -1,7 +1,7 @@
 from flask_jwt_extended import get_jwt_identity
 
 from app.extensions import db
-from app.budget.budget_model import Budget
+from app.modules.budget.budget_model import Budget
 from app.common.exceptions import (
     NotFoundException,
     ValidationException,

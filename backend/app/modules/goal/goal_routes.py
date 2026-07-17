@@ -3,11 +3,11 @@ from flask_jwt_extended import jwt_required
 
 from app.common.responses import success_response
 from app.common.validators import validate_schema
-from app.goal.goal_schema import (
+from app.modules.goal.goal_schema import (
     CreateGoalSchema,
     UpdateGoalSchema,
 )
-from app.goal.goal_service import GoalService
+from app.modules.goal.goal_service import GoalService
 
 goal_bp = Blueprint(
     "goal",
@@ -46,7 +46,7 @@ def get_goals():
             "id": goal.id,
             "title": goal.title,
             "target_amount": float(goal.target_amount),
-            "saved_amount": float(goal.saved_amount),
+            "current_amount": float(goal.current_amount),
             "target_date": goal.target_date.isoformat(),
             "description": goal.description
         })
@@ -65,7 +65,7 @@ def get_goal(goal_id):
             "id": goal.id,
             "title": goal.title,
             "target_amount": float(goal.target_amount),
-            "saved_amount": float(goal.saved_amount),
+            "current_amount": float(goal.current_amount),
             "target_date": goal.target_date.isoformat(),
             "description": goal.description
         }
