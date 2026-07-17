@@ -3,11 +3,11 @@ from flask_jwt_extended import jwt_required
 
 from app.common.responses import success_response
 from app.common.validators import validate_schema
-from app.expense.expense_schema import (
+from app.modules.expense.expense_schema import (
     CreateExpenseSchema,
     UpdateExpenseSchema,
 )
-from app.expense.expense_service import ExpenseService
+from app.modules.expense.expense_service import ExpenseService
 
 expense_bp = Blueprint(
     "expense",
@@ -42,6 +42,7 @@ def get_expenses():
 
     for expense in expenses:
         data.append({
+           
             "id": expense.id,
             "category": expense.category,
             "amount": float(expense.amount),

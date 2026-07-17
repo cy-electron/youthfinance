@@ -4,11 +4,11 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.common.responses import success_response
 from app.common.validators import validate_schema
 
-from app.income.income_schema import (
+from app.modules.income.income_schema import (
     CreateIncomeSchema,
     UpdateIncomeSchema
 )
-from app.income.income_service import IncomeService
+from app.modules.income.income_service import IncomeService
 
 
 income_bp = Blueprint(

@@ -11,7 +11,8 @@ class CreateIncomeSchema(Schema):
     amount = fields.Decimal(
         required=True,
         as_string=True,
-        validate=validate.Range(min=-1, min_inclusive=False)
+        validate=validate.Range(min=0, min_inclusive=False, error="Amount must be greater than 0."),
+        
     )
 
     date = fields.Date(
@@ -32,8 +33,12 @@ class UpdateIncomeSchema(Schema):
     )
 
     amount = fields.Decimal(
-        as_string=True
+    as_string=True,
+    validate=validate.Range(
+        min=0,
+        min_inclusive=False
     )
+)
 
     date = fields.Date()
 

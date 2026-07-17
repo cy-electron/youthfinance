@@ -1,5 +1,5 @@
 from app.extensions import db
-from app.income.income_model import Income
+from app.modules.income.income_model import Income
 from app.common.exceptions import NotFoundException
 
 
