@@ -1,5 +1,5 @@
 from marshmallow import Schema, fields, validate
-
+from app.common.custom_validators import positive_amount, non_negative_amount
 
 class InvestmentSchema(Schema):
 
@@ -23,22 +23,14 @@ class InvestmentSchema(Schema):
     amount = fields.Decimal(
     required=True,
     as_string=True,
-    validate=validate.Range(
-        min=0,
-        min_inclusive=False,
-        error="Investment amount must be greater than 0."
-    )
+    validate=positive_amount
 )
 
     current_value = fields.Decimal(
     required=False,
     as_string=True,
     allow_none=True,
-    validate=validate.Range(
-        min=0,
-        min_inclusive=True,
-        error="Current value cannot be negative."
-    )
+    validate=non_negative_amount
 )
 
     investment_date = fields.Date(required=True)

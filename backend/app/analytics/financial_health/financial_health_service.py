@@ -1,5 +1,8 @@
 from flask_jwt_extended import get_jwt_identity
-from sqlalchemy import extract
+from app.modules.investment.investment_model import Investment
+from sqlalchemy import func
+from app.extensions import db
+from app.modules.fun_fund.fun_fund_model import FunFund
 from app.analytics.dashboard.dashboard_service import DashboardService
 from app.modules.goal.goal_model import Goal
 from app.modules.income.income_model import Income
@@ -41,19 +44,18 @@ class FinancialHealthService:
             dashboard
         )
 
-        investment_score = 0
+        investment_score = (
+        FinancialHealthService.calculate_investment_score(
+            user_id
+        )
+    )
 
-        fun_fund_score = 0
-        '''
-        print("Savings:", savings_score)
-        print("Budget:", budget_score)
-        print("Goal:", goal_score)
-        print("Income:", income_score)
-        print("Expense:", expense_score)
-        print("Emergency:", emergency_score)
-        print("Investment:", investment_score)
-        print("Fun Fund:", fun_fund_score)
-        '''
+        fun_fund_score = (
+        FinancialHealthService.calculate_fun_fund_score(
+            user_id
+        )
+    )
+        
         total = (
             savings_score
             + budget_score
@@ -247,13 +249,40 @@ class FinancialHealthService:
 
     @staticmethod
     def calculate_emergency_fund(dashboard):
-        savings = dashboard["net_savings"]
-        monthly_expense = dashboard["total_expense"]
 
-        if monthly_expense <= 0:
+        user_id = get_jwt_identity()
+
+        savings = dashboard["net_savings"]
+
+        monthly_expenses = (
+            db.session.query(
+                func.extract("year", Expense.date),
+                func.extract("month", Expense.date),
+                func.sum(Expense.amount)
+            )
+            .filter(
+                Expense.user_id == user_id
+            )
+            .group_by(
+                func.extract("year", Expense.date),
+                func.extract("month", Expense.date)
+            )
+            .all()
+        )
+
+        if not monthly_expenses:
             return 0
 
-        months = savings / monthly_expense
+        average_monthly_expense = (
+            sum(float(month[2]) for month in monthly_expenses)
+            /
+            len(monthly_expenses)
+        )
+
+        if average_monthly_expense <= 0:
+            return 0
+
+        months = savings / average_monthly_expense
 
         max_score = FINANCIAL_HEALTH_WEIGHTS["emergency_fund"]
 
@@ -267,4 +296,65 @@ class FinancialHealthService:
             return max_score * 0.5
 
         return max_score * 0.2
+    
+    @staticmethod
+    def calculate_investment_score(user_id):
+
+        investments = Investment.query.filter_by(
+            user_id=user_id
+        ).all()
+
+        if not investments:
+            return 0
+
+        count = len(investments)
+
+        max_score = FINANCIAL_HEALTH_WEIGHTS["investment_habit"]
+
+        if count >= 4:
+            return max_score
+
+        elif count >= 2:
+            return max_score * 0.8
+
+        return max_score * 0.5
+
+    @staticmethod
+    def calculate_fun_fund_score(user_id):
+
+        funds = FunFund.query.filter_by(
+            user_id=user_id
+        ).all()
+
+        if not funds:
+            return 0
+
+        total_progress = 0
+
+        valid_funds = 0
+
+        for fund in funds:
+
+            if float(fund.target_amount) > 0:
+
+                progress = (
+                    float(fund.current_amount)
+                    /
+                    float(fund.target_amount)
+                )
+
+                total_progress += min(progress, 1)
+
+                valid_funds += 1
+
+        if valid_funds == 0:
+            return 0
+
+        average_progress = total_progress / valid_funds
+
+        return (
+            average_progress
+            *
+            FINANCIAL_HEALTH_WEIGHTS["fun_fund"]
+        )
     
