@@ -1,5 +1,5 @@
 from marshmallow import Schema, fields, validate
-
+from app.common.custom_validators import positive_amount, non_negative_amount
 
 class FunFundSchema(Schema):
 
@@ -8,21 +8,13 @@ class FunFundSchema(Schema):
     target_amount = fields.Decimal(
     required=True,
     as_string=True,
-    validate=validate.Range(
-        min=0,
-        min_inclusive=False,
-        error="Target amount must be greater than 0."
-    )
+    validate=positive_amount
 )
 
     current_amount = fields.Decimal(
     required=False,
     as_string=True,
-    validate=validate.Range(
-        min=0,
-        min_inclusive=True,
-        error="Current amount cannot be negative."
-    )
+    validate=non_negative_amount
 )
 
     target_date = fields.Date(
