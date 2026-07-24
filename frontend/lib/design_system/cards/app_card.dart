@@ -8,8 +8,9 @@ class AppCard extends StatelessWidget {
   final Widget child;
 
   final EdgeInsetsGeometry? padding;
+  final VoidCallback? onTop;
 
-  const AppCard({super.key, required this.child, this.padding});
+  const AppCard({super.key, required this.child, this.padding, this.onTop});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +20,7 @@ class AppCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface,
 
-        borderRadius: BorderRadius.circular(AppRadius.md),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
 
         boxShadow: AppElevation.card,
 
