@@ -12,10 +12,19 @@ class AppBottomNavigation extends StatelessWidget {
     required this.onTap,
   });
 
+  // Second pass — different picks aimed at a cleaner, more distinctly
+  // "modern fintech app" feel:
+  // - grid_view_rounded: simple clean grid for Home
+  // - swap_horiz_rounded: classic transfer/transaction symbol
+  // - flag_rounded: unchanged, already a good fit for Goals
+  // - query_stats_rounded: magnifying-glass-over-bars, reads as
+  //   "analytics/insights" more distinctly than a plain bar chart
+  // - account_circle_outlined: a more recognizable "profile" silhouette
+  //   than a bare outlined person
   static const _items = [
-    {'icon': Icons.home_rounded, 'label': 'Home'},
+    {'icon': Icons.space_dashboard_rounded, 'label': 'Home'},
     {'icon': Icons.receipt_long_rounded, 'label': 'Transactions'},
-    {'icon': Icons.flag_rounded, 'label': 'Goals'},
+    {'icon': Icons.track_changes_rounded, 'label': 'Goals'},
     {'icon': Icons.insights_rounded, 'label': 'Insights'},
     {'icon': Icons.person_rounded, 'label': 'Profile'},
   ];

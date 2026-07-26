@@ -1,156 +1,178 @@
 import 'package:flutter/material.dart';
+import 'package:youthfinance/features/goals/model/goal_model.dart';
 
-import '../../../../../core/theme/app_colors.dart';
-import '../../../../../core/theme/app_spacing.dart';
-import '../../../../../core/theme/app_radius.dart';
-import '../../../../../design_system/cards/app_card.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_text_styles.dart';
+import '../../../../design_system/cards/app_card.dart';
 
 class GoalCard extends StatelessWidget {
-  final String title;
-  final IconData icon;
+  final GoalModel goal;
 
-  final double currentAmount;
-  final double targetAmount;
+  // Removed the extra required params (title, icon, currentAmount,
+  // targetAmount, dueDate, status) that were on the constructor but
+  // never stored or used anywhere in build() — everything this widget
+  // needs already comes from `goal`.
+  const GoalCard({super.key, required this.goal});
 
-  final String dueDate;
-  final String status;
+  Color get statusColor {
+    switch (goal.status) {
+      case GoalStatus.onTrack:
+        return Colors.green;
 
-  const GoalCard({
-    super.key,
-    required this.title,
-    required this.icon,
-    required this.currentAmount,
-    required this.targetAmount,
-    required this.dueDate,
-    required this.status,
-  });
+      case GoalStatus.attention:
+        return Colors.orange;
+
+      case GoalStatus.delayed:
+        return Colors.red;
+
+      case GoalStatus.completed:
+        return AppColors.primary;
+    }
+  }
+
+  String get statusText {
+    switch (goal.status) {
+      case GoalStatus.onTrack:
+        return "ON TRACK";
+
+      case GoalStatus.attention:
+        return "NEEDS ATTENTION";
+
+      case GoalStatus.delayed:
+        return "DELAYED";
+
+      case GoalStatus.completed:
+        return "COMPLETED";
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final progress = (currentAmount / targetAmount).clamp(0.0, 1.0);
-
     return AppCard(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            /// Header
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 22,
-                  backgroundColor: AppColors.primary.withValues(alpha: .10),
-                  child: Icon(icon, color: AppColors.primary),
-                ),
-
-                const SizedBox(width: AppSpacing.md),
-
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(fontWeight: FontWeight.w700),
-                      ),
-
-                      const SizedBox(height: 4),
-
-                      Text(
-                        "Due $dueDate",
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                    ],
-                  ),
-                ),
-
-                _StatusChip(status: status),
-              ],
-            ),
-
-            const SizedBox(height: AppSpacing.lg),
-
-            /// Amounts
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "₹${currentAmount.toStringAsFixed(0)}",
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                ),
-
-                Text(
-                  "of ₹${targetAmount.toStringAsFixed(0)}",
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ],
-            ),
-
-            const SizedBox(height: AppSpacing.md),
-
-            ClipRRect(
-              borderRadius: BorderRadius.circular(AppRadius.full),
-              child: LinearProgressIndicator(value: progress, minHeight: 8),
-            ),
-
-            const SizedBox(height: AppSpacing.sm),
-
-            Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                "${(progress * 100).toStringAsFixed(0)}%",
-                style: Theme.of(
-                  context,
-                ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          //---------------- HEADER ----------------//
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 22,
+                backgroundColor: statusColor.withOpacity(.08),
+                child: Icon(goal.icon, color: statusColor),
               ),
+
+              const SizedBox(width: AppSpacing.md),
+
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(goal.title, style: AppTextStyles.cardTitle),
+
+                    const SizedBox(height: 4),
+
+                    Text(
+                      statusText,
+                      style: AppTextStyles.caption.copyWith(
+                        color: statusColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              Column(
+                children: [
+                  Text(
+                    "${(goal.progress * 100).round()}%",
+                    style: AppTextStyles.cardTitle,
+                  ),
+
+                  Text("Progress", style: AppTextStyles.caption),
+                ],
+              ),
+            ],
+          ),
+
+          const SizedBox(height: AppSpacing.lg),
+
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: LinearProgressIndicator(
+              minHeight: 8,
+              value: goal.progress,
+              backgroundColor: AppColors.primary.withOpacity(.10),
+              valueColor: AlwaysStoppedAnimation(statusColor),
             ),
-          ],
-        ),
+          ),
+
+          const SizedBox(height: AppSpacing.xl),
+
+          Row(
+            children: [
+              Expanded(
+                child: _Stat("Saved", "₹${goal.saved} / ₹${goal.target}"),
+              ),
+
+              Expanded(child: _Stat("Time Left", "${goal.monthsLeft} Months")),
+            ],
+          ),
+
+          const SizedBox(height: AppSpacing.lg),
+
+          Row(
+            children: [
+              Expanded(child: _Stat("Monthly", "₹${goal.monthlyContribution}")),
+
+              Expanded(child: _Stat("Finish", goal.expectedFinish)),
+            ],
+          ),
+
+          const SizedBox(height: AppSpacing.lg),
+
+          Divider(),
+
+          const SizedBox(height: AppSpacing.sm),
+
+          Row(
+            children: [
+              Icon(Icons.lightbulb_outline, color: statusColor, size: 18),
+
+              const SizedBox(width: 8),
+
+              Expanded(
+                child: Text(
+                  goal.insight,
+                  style: AppTextStyles.caption.copyWith(color: statusColor),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 }
 
-class _StatusChip extends StatelessWidget {
-  final String status;
+class _Stat extends StatelessWidget {
+  final String title;
+  final String value;
 
-  const _StatusChip({required this.status});
+  const _Stat(this.title, this.value);
 
   @override
   Widget build(BuildContext context) {
-    Color color;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title.toUpperCase(), style: AppTextStyles.caption),
 
-    switch (status) {
-      case "Completed":
-        color = Colors.green;
-        break;
+        const SizedBox(height: 6),
 
-      case "Behind":
-        color = Colors.red;
-        break;
-
-      default:
-        color = Colors.orange;
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: .12),
-        borderRadius: BorderRadius.circular(AppRadius.full),
-      ),
-      child: Text(
-        status,
-        style: TextStyle(
-          color: color,
-          fontWeight: FontWeight.w600,
-          fontSize: 12,
-        ),
-      ),
+        Text(value, style: AppTextStyles.sectionTitle),
+      ],
     );
   }
 }

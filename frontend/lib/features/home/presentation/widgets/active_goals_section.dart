@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../design_system/typography/section_header.dart';
+import '../../../goals/data/dummy_goals.dart';
 import '../../../goals/presentation/widgets/goal_card.dart';
 
 class ActiveGoalsSection extends StatelessWidget {
@@ -22,23 +23,13 @@ class ActiveGoalsSection extends StatelessWidget {
         const SizedBox(height: 16),
 
         GoalCard(
-          title: "Emergency Fund",
-          icon: Icons.savings,
-          currentAmount: 25000,
-          targetAmount: 50000,
-          dueDate: "Dec 2026",
-          status: "On Track",
+          goal: dummyGoals[2], // Emergency Fund
         ),
 
         const SizedBox(height: 16),
 
         GoalCard(
-          title: "New Laptop",
-          icon: Icons.laptop_mac,
-          currentAmount: 45000,
-          targetAmount: 90000,
-          dueDate: "Mar 2027",
-          status: "Behind",
+          goal: dummyGoals[1], // MacBook Pro
         ),
       ],
     );
