@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../../dashboard/presentation/screens/dashboard_screen.dart';
+import '../../../home/presentation/screens/home_screen.dart';
 import '../../../transactions/presentation/screens/transaction_screen.dart';
 import '../../../goals/presentation/screens/goals_screen.dart';
-import '../../../analytics/presentation/screens/analytics_screen.dart';
+import '../../../analytics/presentation/screens/insights_screen.dart';
 import '../../../profile/presentation/screens/profile_screen.dart';
 
 class AppShell extends StatefulWidget {
@@ -17,9 +17,9 @@ class _AppShellState extends State<AppShell> {
   int currentIndex = 0;
 
   final List<Widget> pages = const [
-    DashboardScreen(),
+    HomeScreen(),
 
-    TransactionScreen(),
+    TransactionsScreen(),
 
     GoalsScreen(),
 

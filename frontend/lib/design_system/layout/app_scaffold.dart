@@ -8,9 +8,11 @@ class AppScaffold extends StatelessWidget {
   final PreferredSizeWidget? appBar;
   final Widget? floatingActionButton;
   final Widget? bottomNavigationBar;
+  final String? title;
 
   const AppScaffold({
     super.key,
+    this.title,
     required this.body,
     this.appBar,
     this.floatingActionButton,
@@ -21,7 +23,15 @@ class AppScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: appBar,
+      appBar:
+          appBar ??
+          (title != null
+              ? AppBar(
+                  elevation: 0,
+                  backgroundColor: AppColors.background,
+                  title: Text(title!),
+                )
+              : null),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.md),
