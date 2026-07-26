@@ -43,32 +43,38 @@ class _AppShellState extends State<AppShell> {
         },
 
         destinations: const [
+          // Home: an actual house icon now, not a dashboard grid.
           NavigationDestination(
-            icon: Icon(Icons.dashboard_outlined),
-            selectedIcon: Icon(Icons.dashboard),
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home_rounded),
             label: "Home",
           ),
 
           NavigationDestination(
             icon: Icon(Icons.swap_horiz_outlined),
-            selectedIcon: Icon(Icons.swap_horiz),
+            selectedIcon: Icon(Icons.swap_horiz_rounded),
             label: "Transactions",
           ),
 
           NavigationDestination(
             icon: Icon(Icons.flag_outlined),
-            selectedIcon: Icon(Icons.flag),
+            selectedIcon: Icon(Icons.flag_rounded),
             label: "Goals",
           ),
 
+          // insights_outlined/insights_rounded matches the "Insights"
+          // label directly (was analytics_outlined/analytics — a more
+          // generic icon for a tab that's specifically named Insights).
           NavigationDestination(
-            icon: Icon(Icons.analytics_outlined),
-            selectedIcon: Icon(Icons.analytics),
+            icon: Icon(Icons.insights_outlined),
+            selectedIcon: Icon(Icons.insights_rounded),
             label: "Insights",
           ),
 
+          // account_circle reads as a clearer "profile" silhouette than
+          // a bare person icon.
           NavigationDestination(
-            icon: Icon(Icons.person_outline),
+            icon: Icon(Icons.person),
             selectedIcon: Icon(Icons.person),
             label: "Profile",
           ),

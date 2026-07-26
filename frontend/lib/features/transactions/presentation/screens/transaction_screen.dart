@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../../../design_system/layout/app_scaffold.dart';
 import '../widgets/filter_chips.dart';
 import '../widgets/monthly_summary.dart';
@@ -12,8 +14,9 @@ class TransactionsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      title: "Transactions",
-
+      // Dropped AppScaffold's `title` (renders as a plain, small AppBar
+      // title) in favor of a bold custom heading below, matching the
+      // Goals/Insights screens' header style.
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primary,
         onPressed: () {},
@@ -23,18 +26,29 @@ class TransactionsScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            MonthlySummary(),
+          children: [
+            // Small top breathing space before the bold title, same as
+            // the fix applied to the Profile screen's header.
+            const SizedBox(height: AppSpacing.sm),
 
-            SizedBox(height: 24),
+            Text(
+              "Transactions",
+              style: AppTextStyles.heading.copyWith(fontSize: 28),
+            ),
 
-            TransactionFilterChips(),
+            const SizedBox(height: AppSpacing.xl),
 
-            SizedBox(height: 24),
+            const MonthlySummary(),
 
-            TransactionList(),
+            const SizedBox(height: 24),
 
-            SizedBox(height: 100),
+            const TransactionFilterChips(),
+
+            const SizedBox(height: 24),
+
+            const TransactionList(),
+
+            const SizedBox(height: 100),
           ],
         ),
       ),
