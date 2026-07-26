@@ -35,4 +35,6 @@ class AppTextStyles {
     fontSize: 12,
     color: AppColors.textSecondary,
   );
+
+  static get label => null;
 }
