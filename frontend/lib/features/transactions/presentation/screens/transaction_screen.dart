@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:youthfinance/features/transactions/model/transaction_filter.dart';
+import 'package:youthfinance/features/transactions/presentation/widgets/add_transaction_sheet.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -8,18 +10,43 @@ import '../widgets/filter_chips.dart';
 import '../widgets/monthly_summary.dart';
 import '../widgets/transaction_list.dart';
 
-class TransactionsScreen extends StatelessWidget {
+class TransactionsScreen extends StatefulWidget {
   const TransactionsScreen({super.key});
+
+  @override
+  State<TransactionsScreen> createState() => _TransactionsScreenState();
+}
+
+class _TransactionsScreenState extends State<TransactionsScreen> {
+  TransactionFilter selectedFilter = TransactionFilter.all;
 
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      // Dropped AppScaffold's `title` (renders as a plain, small AppBar
-      // title) in favor of a bold custom heading below, matching the
-      // Goals/Insights screens' header style.
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primary,
-        onPressed: () {},
+        onPressed: () async {
+          final result = await showModalBottomSheet<String>(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.white,
+            builder: (context) {
+              return const AddTransactionSheet();
+            },
+          );
+
+          if (!context.mounted) return;
+
+          if (result == 'income') {
+            // Income form will be connected in the next step.
+            debugPrint('Income selected');
+          }
+
+          if (result == 'expense') {
+            // Expense form will be connected after income.
+            debugPrint('Expense selected');
+          }
+        },
         child: const Icon(Icons.add, color: Colors.white),
       ),
 
@@ -27,8 +54,6 @@ class TransactionsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Small top breathing space before the bold title, same as
-            // the fix applied to the Profile screen's header.
             const SizedBox(height: AppSpacing.sm),
 
             Text(
@@ -42,11 +67,18 @@ class TransactionsScreen extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            const TransactionFilterChips(),
+            TransactionFilterChips(
+              selected: selectedFilter,
+              onSelected: (filter) {
+                setState(() {
+                  selectedFilter = filter;
+                });
+              },
+            ),
 
             const SizedBox(height: 24),
 
-            const TransactionList(),
+            TransactionList(filter: selectedFilter),
 
             const SizedBox(height: 100),
           ],

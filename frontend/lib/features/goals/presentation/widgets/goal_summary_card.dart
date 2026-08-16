@@ -25,7 +25,7 @@ class GoalSummaryCard extends StatelessWidget {
             animation: true,
             animationDuration: 900,
             progressColor: AppColors.primary,
-            backgroundColor: AppColors.primary.withOpacity(.10),
+            backgroundColor: AppColors.primary.withValues(alpha: .10),
             center: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
