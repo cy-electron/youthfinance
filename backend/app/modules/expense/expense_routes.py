@@ -16,7 +16,7 @@ expense_bp = Blueprint(
 )
 
 
-@expense_bp.route("/", methods=["POST"])
+@expense_bp.route("", methods=["POST"])
 @jwt_required()
 def create_expense():
     data = validate_schema(CreateExpenseSchema, request.json)
@@ -32,7 +32,7 @@ def create_expense():
     )
 
 
-@expense_bp.route("/", methods=["GET"])
+@expense_bp.route("", methods=["GET"])
 @jwt_required()
 def get_expenses():
 
