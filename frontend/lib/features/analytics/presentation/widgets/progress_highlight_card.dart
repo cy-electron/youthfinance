@@ -17,7 +17,7 @@ class ProgressHighlightCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(.10),
+              color: AppColors.primary.withValues(alpha: .10),
               borderRadius: BorderRadius.circular(14),
             ),
             child: const Icon(

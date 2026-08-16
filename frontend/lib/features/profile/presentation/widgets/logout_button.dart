@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youthfinance/features/auth/providers/auth_provider.dart';
 
-class LogoutButton extends StatelessWidget {
+class LogoutButton extends ConsumerWidget {
   const LogoutButton({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return SizedBox(
       width: double.infinity,
       child: FilledButton.tonal(
-        onPressed: () {},
+        onPressed: () async {
+          await ref.read(authProvider.notifier).logout();
+        },
 
         style: FilledButton.styleFrom(
           foregroundColor: Colors.red,

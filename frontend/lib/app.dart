@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'core/theme/app_theme.dart';
 import 'core/router/app_router.dart';
 
-class YouthFinanceApp extends StatelessWidget {
+class YouthFinanceApp extends ConsumerWidget {
   const YouthFinanceApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(appRouterProvider);
+
     return MaterialApp.router(
       title: "YouthFinance",
-
       debugShowCheckedModeBanner: false,
-
       theme: AppTheme.lightTheme,
-      routerConfig: appRouter,
-
-      //home: const Scaffold(body: Center(child: Text("YouthFinance"))),
+      routerConfig: router,
     );
   }
 }

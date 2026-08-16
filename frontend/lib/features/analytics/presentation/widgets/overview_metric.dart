@@ -42,8 +42,8 @@ class OverviewMetric extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
 
                 decoration: BoxDecoration(
-                  color: (positive ? Colors.green : Colors.red).withOpacity(
-                    .10,
+                  color: (positive ? Colors.green : Colors.red).withValues(
+                    alpha: .10,
                   ),
 
                   borderRadius: BorderRadius.circular(6),

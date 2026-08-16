@@ -58,7 +58,7 @@ class GoalCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 22,
-                backgroundColor: statusColor.withOpacity(.08),
+                backgroundColor: statusColor.withValues(alpha: .08),
                 child: Icon(goal.icon, color: statusColor),
               ),
 
@@ -103,7 +103,7 @@ class GoalCard extends StatelessWidget {
             child: LinearProgressIndicator(
               minHeight: 8,
               value: goal.progress,
-              backgroundColor: AppColors.primary.withOpacity(.10),
+              backgroundColor: AppColors.primary.withValues(alpha: .10),
               valueColor: AlwaysStoppedAnimation(statusColor),
             ),
           ),

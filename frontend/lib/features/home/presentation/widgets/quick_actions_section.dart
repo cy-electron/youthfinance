@@ -1,14 +1,41 @@
 import 'package:flutter/material.dart';
+
 import 'package:youthfinance/design_system/typography/section_header.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../design_system/buttons/action_tile.dart';
-//import '../../../../design_system/layout/section_header.dart';
+
 import '../../domain/models/quick_action_model.dart';
+
+// Reuse the existing transaction sheets
+import '../../../transactions/presentation/widgets/add_income_sheet.dart';
+import '../../../transactions/presentation/widgets/add_expense_sheet.dart';
 
 class QuickActionsSection extends StatelessWidget {
   const QuickActionsSection({super.key});
+
+  void _showAddIncome(BuildContext context) {
+    showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      builder: (_) {
+        return const AddIncomeSheet();
+      },
+    );
+  }
+
+  void _showAddExpense(BuildContext context) {
+    showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      builder: (_) {
+        return const AddExpenseSheet();
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,28 +44,32 @@ class QuickActionsSection extends StatelessWidget {
         title: "Add Income",
         icon: Icons.arrow_downward_rounded,
         color: AppColors.success,
-        onTap: () {},
+        onTap: () => _showAddIncome(context),
       ),
 
       QuickActionModel(
         title: "Add Expense",
         icon: Icons.remove_rounded,
         color: AppColors.expense,
-        onTap: () {},
+        onTap: () => _showAddExpense(context),
       ),
 
       QuickActionModel(
         title: "Add Goal",
         icon: Icons.flag_rounded,
         color: AppColors.info,
-        onTap: () {},
+        onTap: () {
+          // Coming next
+        },
       ),
 
       QuickActionModel(
         title: "Planner",
         icon: Icons.calendar_month_rounded,
         color: AppColors.primary,
-        onTap: () {},
+        onTap: () {
+          // Coming next
+        },
       ),
     ];
 
@@ -51,9 +82,6 @@ class QuickActionsSection extends StatelessWidget {
 
         LayoutBuilder(
           builder: (context, constraints) {
-            // On a phone this stays at 4 columns, which lays all 4 tiles
-            // out in a single row (matches the design). The 6-column branch
-            // only kicks in on wide/tablet layouts.
             final crossAxisCount = constraints.maxWidth > 700 ? 6 : 4;
 
             return GridView.builder(
@@ -62,16 +90,10 @@ class QuickActionsSection extends StatelessWidget {
               itemCount: actions.length,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: crossAxisCount,
-                // Narrower gaps between tiles (was AppSpacing.md).
                 crossAxisSpacing: AppSpacing.sm,
                 mainAxisSpacing: AppSpacing.sm,
-                // Slightly taller than wide (icon circle + up to a
-                // 2-line label). Lowered further from .85 to give the
-                // larger icon/text in ActionTile more room, so FittedBox
-                // doesn't shrink it back down to compensate.
                 childAspectRatio: .75,
               ),
-
               itemBuilder: (context, index) {
                 final item = actions[index];
 

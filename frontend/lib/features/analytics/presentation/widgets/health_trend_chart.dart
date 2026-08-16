@@ -80,7 +80,7 @@ class HealthTrendChart extends StatelessWidget {
 
                     belowBarData: BarAreaData(
                       show: true,
-                      color: AppColors.primary.withOpacity(.10),
+                      color: AppColors.primary.withValues(alpha: .10),
                     ),
 
                     spots: const [

@@ -1,20 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:youthfinance/features/transactions/model/transaction_filter.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
 
-class TransactionFilterChips extends StatefulWidget {
-  const TransactionFilterChips({super.key});
+class TransactionFilterChips extends StatelessWidget {
+  final TransactionFilter selected;
+  final ValueChanged<TransactionFilter> onSelected;
 
-  @override
-  State<TransactionFilterChips> createState() => _TransactionFilterChipsState();
-}
+  const TransactionFilterChips({
+    super.key,
+    required this.selected,
+    required this.onSelected,
+  });
 
-class _TransactionFilterChipsState extends State<TransactionFilterChips> {
-  int selected = 0;
+  static const filters = [
+    TransactionFilter.all,
+    TransactionFilter.income,
+    TransactionFilter.expense,
+    TransactionFilter.investments,
+  ];
 
-  final filters = ["All", "Income", "Expense", "Investments"];
+  String _label(TransactionFilter filter) {
+    switch (filter) {
+      case TransactionFilter.all:
+        return 'All';
+
+      case TransactionFilter.income:
+        return 'Income';
+
+      case TransactionFilter.expense:
+        return 'Expense';
+
+      case TransactionFilter.investments:
+        return 'Investments';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,12 +47,11 @@ class _TransactionFilterChipsState extends State<TransactionFilterChips> {
         itemCount: filters.length,
         separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.sm),
         itemBuilder: (_, index) {
-          final active = selected == index;
+          final filter = filters[index];
+          final active = selected == filter;
 
           return GestureDetector(
-            onTap: () {
-              setState(() => selected = index);
-            },
+            onTap: () => onSelected(filter),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 250),
               padding: const EdgeInsets.symmetric(horizontal: 18),
@@ -41,7 +62,7 @@ class _TransactionFilterChipsState extends State<TransactionFilterChips> {
               ),
               alignment: Alignment.center,
               child: Text(
-                filters[index],
+                _label(filter),
                 style: AppTextStyles.body.copyWith(
                   fontWeight: FontWeight.w600,
                   color: active ? Colors.white : AppColors.textSecondary,
