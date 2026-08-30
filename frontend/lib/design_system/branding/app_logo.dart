@@ -7,22 +7,11 @@ class AppLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Image.asset(
+      'assets/images/yf_logo.jpeg',
       width: size,
       height: size,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: Colors.green,
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Text(
-        "YF",
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: size * 0.35,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+      fit: BoxFit.contain,
     );
   }
 }

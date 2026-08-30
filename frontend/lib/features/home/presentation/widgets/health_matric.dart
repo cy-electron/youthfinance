@@ -19,6 +19,8 @@ class HealthMetric extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final safeProgress = progress.clamp(0.0, 1.0);
+
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -52,9 +54,9 @@ class HealthMetric extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(100),
             child: LinearProgressIndicator(
-              value: progress,
+              value: safeProgress,
               minHeight: 6,
-              backgroundColor: Color(0xffECECEC),
+              backgroundColor: const Color(0xffECECEC),
               color: AppColors.primary,
             ),
           ),

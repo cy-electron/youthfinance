@@ -51,21 +51,7 @@ class _SplashScreenState extends State<SplashScreen>
       body: Center(
         child: FadeTransition(
           opacity: fadeAnimation,
-
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-
-            children: const [
-              AppLogo(),
-
-              SizedBox(height: 24),
-
-              Text(
-                "YouthFinance",
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
+          child: const AppLogo(size: 280),
         ),
       ),
     );

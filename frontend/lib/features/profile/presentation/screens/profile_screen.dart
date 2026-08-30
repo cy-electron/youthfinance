@@ -4,7 +4,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../design_system/layout/app_scaffold.dart';
 
 import '../widgets/profile_header.dart';
-import '../widgets/milestone_section.dart';
+import '../widgets/useful_tools_section.dart';
 import '../widgets/learning_card.dart';
 import '../widgets/interest_chips.dart';
 import '../widgets/settings_section.dart';
@@ -31,7 +31,7 @@ class ProfileScreen extends StatelessWidget {
 
             SizedBox(height: AppSpacing.xl),
 
-            MilestoneSection(),
+            UsefulToolsSection(),
 
             SizedBox(height: AppSpacing.xl),
 

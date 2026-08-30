@@ -23,6 +23,7 @@ class AppScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
+
       appBar:
           appBar ??
           (title != null
@@ -32,13 +33,16 @@ class AppScaffold extends StatelessWidget {
                   title: Text(title!),
                 )
               : null),
+
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.md),
           child: body,
         ),
       ),
+
       floatingActionButton: floatingActionButton,
+
       bottomNavigationBar: bottomNavigationBar,
     );
   }

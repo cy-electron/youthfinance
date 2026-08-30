@@ -8,12 +8,22 @@ import '../../../../design_system/buttons/action_tile.dart';
 
 import '../../domain/models/quick_action_model.dart';
 
-// Reuse the existing transaction sheets
+// Transactions
 import '../../../transactions/presentation/widgets/add_income_sheet.dart';
 import '../../../transactions/presentation/widgets/add_expense_sheet.dart';
 
+// Goals
+import '../../../goals/presentation/widgets/create_goal_sheet.dart';
+
+// Budget
+import '../../../budget/presentation/manage_budget_sheet.dart';
+
 class QuickActionsSection extends StatelessWidget {
   const QuickActionsSection({super.key});
+
+  // ------------------------------------------------------------
+  // ADD INCOME
+  // ------------------------------------------------------------
 
   void _showAddIncome(BuildContext context) {
     showModalBottomSheet<bool>(
@@ -26,6 +36,10 @@ class QuickActionsSection extends StatelessWidget {
     );
   }
 
+  // ------------------------------------------------------------
+  // ADD EXPENSE
+  // ------------------------------------------------------------
+
   void _showAddExpense(BuildContext context) {
     showModalBottomSheet<bool>(
       context: context,
@@ -36,6 +50,40 @@ class QuickActionsSection extends StatelessWidget {
       },
     );
   }
+
+  // ------------------------------------------------------------
+  // ADD GOAL
+  // ------------------------------------------------------------
+
+  Future<void> _showAddGoal(BuildContext context) async {
+    await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      builder: (_) {
+        return const CreateGoalSheet();
+      },
+    );
+  }
+
+  // ------------------------------------------------------------
+  // MANAGE BUDGET
+  // ------------------------------------------------------------
+
+  void _showManageBudget(BuildContext context) {
+    showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      builder: (_) {
+        return const ManageBudgetSheet();
+      },
+    );
+  }
+
+  // ------------------------------------------------------------
+  // BUILD
+  // ------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -58,9 +106,14 @@ class QuickActionsSection extends StatelessWidget {
         title: "Add Goal",
         icon: Icons.flag_rounded,
         color: AppColors.info,
-        onTap: () {
-          // Coming next
-        },
+        onTap: () => _showAddGoal(context),
+      ),
+
+      QuickActionModel(
+        title: "Manage Budget",
+        icon: Icons.account_balance_wallet_rounded,
+        color: AppColors.primary,
+        onTap: () => _showManageBudget(context),
       ),
 
       QuickActionModel(
@@ -82,28 +135,35 @@ class QuickActionsSection extends StatelessWidget {
 
         LayoutBuilder(
           builder: (context, constraints) {
-            final crossAxisCount = constraints.maxWidth > 700 ? 6 : 4;
+            const visibleItems = 4;
 
-            return GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: actions.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: crossAxisCount,
-                crossAxisSpacing: AppSpacing.sm,
-                mainAxisSpacing: AppSpacing.sm,
-                childAspectRatio: .75,
+            final tileWidth =
+                (constraints.maxWidth - (AppSpacing.sm * (visibleItems - 1))) /
+                visibleItems;
+
+            return SizedBox(
+              height: tileWidth / 0.75,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                itemCount: actions.length,
+                separatorBuilder: (_, __) {
+                  return const SizedBox(width: AppSpacing.sm);
+                },
+                itemBuilder: (context, index) {
+                  final item = actions[index];
+
+                  return SizedBox(
+                    width: tileWidth,
+                    child: ActionTile(
+                      icon: item.icon,
+                      title: item.title,
+                      color: item.color,
+                      onTap: item.onTap,
+                    ),
+                  );
+                },
               ),
-              itemBuilder: (context, index) {
-                final item = actions[index];
-
-                return ActionTile(
-                  icon: item.icon,
-                  title: item.title,
-                  color: item.color,
-                  onTap: item.onTap,
-                );
-              },
             );
           },
         ),

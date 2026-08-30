@@ -1,83 +1,123 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
-import 'package:youthfinance/core/theme/app_text_styles.dart';
-import 'package:youthfinance/design_system/cards/app_card.dart';
+import 'package:youthfinance/features/goals/model/goal_provider.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_text_styles.dart';
+import '../../../../design_system/cards/app_card.dart';
 
-class GoalSummaryCard extends StatelessWidget {
+class GoalSummaryCard extends ConsumerWidget {
   const GoalSummaryCard({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    const progress = 0.42;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final goalsAsync = ref.watch(goalProvider);
 
-    return AppCard(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CircularPercentIndicator(
-            radius: 52,
-            lineWidth: 10,
-            percent: progress,
-            circularStrokeCap: CircularStrokeCap.round,
-            animation: true,
-            animationDuration: 900,
-            progressColor: AppColors.primary,
-            backgroundColor: AppColors.primary.withValues(alpha: .10),
-            center: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "42%",
-                  style: AppTextStyles.heading.copyWith(
-                    fontSize: 28,
-                    height: 1,
-                  ),
-                ),
-                Text("Overall", style: AppTextStyles.caption),
-              ],
-            ),
-          ),
+    return goalsAsync.when(
+      loading: () => const AppCard(
+        child: SizedBox(
+          height: 130,
+          child: Center(child: CircularProgressIndicator()),
+        ),
+      ),
 
-          const SizedBox(width: AppSpacing.lg),
+      error: (_, __) => const AppCard(child: Text('Goal summary unavailable.')),
 
-          // ACTIVE + SAVED sit side by side in a row, with TOTAL TARGET
-          // as its own full-width row below — was a single stacked
-          // Column of all three, which doesn't match the 2-column +
-          // 1-row layout in the design.
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+      data: (goals) {
+        final activeGoals = goals.where((goal) => !goal.isCompleted).toList();
+
+        final totalTarget = activeGoals.fold<double>(
+          0,
+          (sum, goal) => sum + goal.targetAmount,
+        );
+
+        final totalSaved = activeGoals.fold<double>(
+          0,
+          (sum, goal) => sum + goal.currentAmount,
+        );
+
+        final progress = totalTarget <= 0
+            ? 0.0
+            : (totalSaved / totalTarget).clamp(0.0, 1.0);
+
+        return AppCard(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CircularPercentIndicator(
+                radius: 52,
+                lineWidth: 10,
+                percent: progress,
+                circularStrokeCap: CircularStrokeCap.round,
+                animation: true,
+                animationDuration: 900,
+                progressColor: AppColors.primary,
+                backgroundColor: AppColors.primary.withValues(alpha: .10),
+                center: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Expanded(
-                      child: _SummaryItem(title: "ACTIVE", value: "3"),
+                    Text(
+                      '${(progress * 100).round()}%',
+                      style: AppTextStyles.heading.copyWith(
+                        fontSize: 28,
+                        height: 1,
+                      ),
                     ),
-                    Expanded(
-                      child: _SummaryItem(title: "SAVED", value: "₹58K"),
+
+                    Text('Overall', style: AppTextStyles.caption),
+                  ],
+                ),
+              ),
+
+              const SizedBox(width: AppSpacing.lg),
+
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _SummaryItem(
+                            title: 'ACTIVE',
+                            value: activeGoals.length.toString(),
+                          ),
+                        ),
+
+                        Expanded(
+                          child: _SummaryItem(
+                            title: 'SAVED',
+                            value: '₹${_formatAmount(totalSaved)}',
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: AppSpacing.md),
+
+                    _SummaryItem(
+                      title: 'TOTAL TARGET',
+                      value: '₹${_formatAmount(totalTarget)}',
+                      valueColor: AppColors.primary,
                     ),
                   ],
                 ),
-
-                const SizedBox(height: AppSpacing.md),
-
-                // Only this value is colored (matches the design, where
-                // ACTIVE/SAVED values are dark/neutral and only TOTAL
-                // TARGET is highlighted in green).
-                _SummaryItem(
-                  title: "TOTAL TARGET",
-                  value: "₹140K",
-                  valueColor: AppColors.primary,
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
+  }
+
+  static String _formatAmount(double amount) {
+    if (amount == amount.roundToDouble()) {
+      return amount.toInt().toString();
+    }
+
+    return amount.toStringAsFixed(2);
   }
 }
 

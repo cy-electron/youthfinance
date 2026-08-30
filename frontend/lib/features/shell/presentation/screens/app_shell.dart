@@ -16,16 +16,31 @@ class AppShell extends StatefulWidget {
 class _AppShellState extends State<AppShell> {
   int currentIndex = 0;
 
-  final List<Widget> pages = const [
-    HomeScreen(),
+  // ============================================================
+  // Main application pages
+  // ============================================================
 
-    TransactionsScreen(),
+  List<Widget> get pages => [
+    HomeScreen(
+      onNavigateToTransactions: () {
+        setState(() {
+          currentIndex = 1;
+        });
+      },
+      onNavigateToInsights: () {
+        setState(() {
+          currentIndex = 3;
+        });
+      },
+    ),
 
-    GoalsScreen(),
+    const TransactionsScreen(),
 
-    AnalyticsScreen(),
+    const GoalsScreen(),
 
-    ProfileScreen(),
+    const AnalyticsScreen(),
+
+    const ProfileScreen(),
   ];
 
   @override
@@ -33,9 +48,11 @@ class _AppShellState extends State<AppShell> {
     return Scaffold(
       body: pages[currentIndex],
 
+      // ========================================================
+      // Bottom Navigation
+      // ========================================================
       bottomNavigationBar: NavigationBar(
         selectedIndex: currentIndex,
-
         onDestinationSelected: (index) {
           setState(() {
             currentIndex = index;
@@ -43,7 +60,6 @@ class _AppShellState extends State<AppShell> {
         },
 
         destinations: const [
-          // Home: an actual house icon now, not a dashboard grid.
           NavigationDestination(
             icon: Icon(Icons.home_outlined),
             selectedIcon: Icon(Icons.home_rounded),
@@ -62,17 +78,12 @@ class _AppShellState extends State<AppShell> {
             label: "Goals",
           ),
 
-          // insights_outlined/insights_rounded matches the "Insights"
-          // label directly (was analytics_outlined/analytics — a more
-          // generic icon for a tab that's specifically named Insights).
           NavigationDestination(
             icon: Icon(Icons.insights_outlined),
             selectedIcon: Icon(Icons.insights_rounded),
             label: "Insights",
           ),
 
-          // account_circle reads as a clearer "profile" silhouette than
-          // a bare person icon.
           NavigationDestination(
             icon: Icon(Icons.person),
             selectedIcon: Icon(Icons.person),

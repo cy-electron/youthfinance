@@ -9,6 +9,7 @@ import '../../../../design_system/typography/section_header.dart';
 
 import '../../../transactions/income/income_provider.dart';
 import '../../../transactions/expense/expense_provider.dart';
+import '../../../budget/budget_provider.dart';
 
 class MonthlySnapshotSection extends ConsumerWidget {
   const MonthlySnapshotSection({super.key});
@@ -17,9 +18,11 @@ class MonthlySnapshotSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final incomeState = ref.watch(incomeProvider);
     final expenseState = ref.watch(expenseProvider);
+    final budgetState = ref.watch(budgetProvider);
 
     final incomes = incomeState.valueOrNull ?? [];
     final expenses = expenseState.valueOrNull ?? [];
+    final budgets = budgetState.valueOrNull ?? [];
 
     final now = DateTime.now();
 
@@ -40,6 +43,16 @@ class MonthlySnapshotSection extends ConsumerWidget {
               expense.date.year == now.year && expense.date.month == now.month,
         )
         .fold<double>(0, (sum, expense) => sum + expense.amount);
+
+    final currentBudget = budgets
+        .where((budget) => budget.month == now.month && budget.year == now.year)
+        .fold<double>(0, (sum, budget) => sum + budget.amount);
+
+    final budgetLeft = currentBudget - currentExpense;
+
+    final budgetProgress = currentBudget <= 0
+        ? 0.0
+        : (currentExpense / currentBudget).clamp(0.0, 1.0);
 
     final currentSavings = currentIncome - currentExpense;
 
@@ -150,15 +163,15 @@ class MonthlySnapshotSection extends ConsumerWidget {
                 const SizedBox(width: AppSpacing.md),
 
                 // Budget remains untouched for now.
-                const SizedBox(
+                SizedBox(
                   width: 160,
                   child: SummaryCard(
                     icon: Icons.account_balance_wallet,
                     iconColor: AppColors.primary,
                     title: "Budget Left",
-                    value: "₹8,000",
+                    value: _formatAmount(budgetLeft),
                     showProgress: true,
-                    progress: .65,
+                    progress: budgetProgress,
                   ),
                 ),
               ],

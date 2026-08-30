@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:youthfinance/core/theme/app_spacing.dart';
+
 import 'package:youthfinance/features/home/presentation/widgets/active_goals_section.dart';
+import 'package:youthfinance/features/home/presentation/widgets/budget_section.dart';
 import 'package:youthfinance/features/home/presentation/widgets/learning_section.dart';
 import 'package:youthfinance/features/home/presentation/widgets/monthly_snapshot_section.dart';
 import 'package:youthfinance/features/home/presentation/widgets/quick_actions_section.dart';
@@ -8,48 +12,61 @@ import 'package:youthfinance/features/home/presentation/widgets/smart_insight_ca
 import 'package:youthfinance/features/transactions/presentation/widgets/recent_transactions_section.dart';
 
 import '../widgets/financial_health_card.dart';
+import '../widgets/greeting_section.dart';
 import '../../../../design_system/layout/app_scaffold.dart';
 
-import '../widgets/greeting_section.dart';
+class HomeScreen extends ConsumerWidget {
+  final VoidCallback onNavigateToTransactions;
+  final VoidCallback onNavigateToInsights;
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({
+    super.key,
+    required this.onNavigateToTransactions,
+    required this.onNavigateToInsights,
+  });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return AppScaffold(
       body: SingleChildScrollView(
         child: Column(
-          children: const [
-            GreetingSection(),
+          children: [
+            const GreetingSection(),
 
             const SizedBox(height: AppSpacing.xl),
 
-            FinancialHealthCard(score: 78),
+            FinancialHealthCard(onNavigateToInsights: onNavigateToInsights),
 
             const SizedBox(height: AppSpacing.xl),
 
-            MonthlySnapshotSection(),
+            const MonthlySnapshotSection(),
 
             const SizedBox(height: AppSpacing.xl),
 
-            QuickActionsSection(),
+            const QuickActionsSection(),
 
             const SizedBox(height: AppSpacing.xl),
 
-            ActiveGoalsSection(),
+            const ActiveGoalsSection(),
 
             const SizedBox(height: AppSpacing.xl),
 
-            SmartInsightSection(),
+            const SmartInsightSection(),
 
             const SizedBox(height: AppSpacing.xl),
 
-            LearningSection(),
+            const LearningSection(),
 
             const SizedBox(height: AppSpacing.xl),
 
-            RecentTransactionsSection(),
+            const BudgetSection(),
+
+            const SizedBox(height: AppSpacing.xl),
+
+            RecentTransactionsSection(
+              onNavigateToTransactions: onNavigateToTransactions,
+              onViewAll: () {},
+            ),
           ],
         ),
       ),

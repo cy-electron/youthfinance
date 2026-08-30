@@ -1,7 +1,14 @@
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from app.modules.auth.auth_schema import RegisterSchema, LoginSchema
+from app.extensions import db
+
+from app.modules.auth.auth_schema import (
+    RegisterSchema,
+    LoginSchema,
+    ProfileUpdateSchema,
+)
+
 from app.modules.auth.auth_service import AuthService
 
 from app.common.responses import success_response
@@ -17,9 +24,19 @@ auth_bp = Blueprint(
     url_prefix="/api/auth"
 )
 
+
+# ============================================================
+# Schemas
+# ============================================================
+
 register_schema = RegisterSchema()
 login_schema = LoginSchema()
+profile_update_schema = ProfileUpdateSchema()
 
+
+# ============================================================
+# Register
+# ============================================================
 
 @auth_bp.route("/register", methods=["POST"])
 def register():
@@ -36,6 +53,10 @@ def register():
         status_code=201
     )
 
+
+# ============================================================
+# Login
+# ============================================================
 
 @auth_bp.route("/login", methods=["POST"])
 def login():
@@ -55,7 +76,13 @@ def login():
     )
 
 
-@auth_bp.route("/profile", methods=["GET"])
+# ============================================================
+# Profile
+# GET    → Fetch current profile
+# PATCH  → Update current profile
+# ============================================================
+
+@auth_bp.route("/profile", methods=["GET", "PATCH"])
 @jwt_required()
 def profile():
 
@@ -66,11 +93,38 @@ def profile():
     if not user:
         raise NotFoundException("User not found.")
 
+    # --------------------------------------------------------
+    # Update profile
+    # --------------------------------------------------------
+
+    if request.method == "PATCH":
+
+        data = validate_schema(
+            profile_update_schema,
+            request.get_json()
+        )
+
+        user.full_name = data["full_name"]
+        user.age = data["age"]
+        user.gender = data["gender"]
+        user.region = data["region"]
+        user.occupation = data["occupation"]
+
+        db.session.commit()
+
+    # --------------------------------------------------------
+    # Return current profile
+    # --------------------------------------------------------
+
     return success_response(
         data={
             "id": user.id,
             "full_name": user.full_name,
             "email": user.email,
-            "is_active": user.is_active
+            "age": user.age,
+            "gender": user.gender,
+            "region": user.region,
+            "occupation": user.occupation,
+            "is_active": user.is_active,
         }
     )
