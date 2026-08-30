@@ -1,4 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youthfinance/features/analytics/data/financial_health_provider.dart';
+import 'package:youthfinance/features/analytics/presentation/screens/dashboard_provider.dart';
+import 'package:youthfinance/features/budget/budget_provider.dart';
+import 'package:youthfinance/features/goals/model/goal_provider.dart';
+import 'package:youthfinance/features/transactions/model/transaction_provider.dart';
 
 import '../data/auth_models.dart';
 import '../data/auth_repository.dart';
@@ -9,13 +14,15 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
 
 final authProvider =
     StateNotifierProvider<AuthNotifier, AsyncValue<UserModel?>>((ref) {
-      return AuthNotifier(ref.read(authRepositoryProvider));
+      return AuthNotifier(ref, ref.read(authRepositoryProvider));
     });
 
 class AuthNotifier extends StateNotifier<AsyncValue<UserModel?>> {
+  final Ref _ref;
   final AuthRepository _repository;
 
-  AuthNotifier(this._repository) : super(const AsyncValue.data(null));
+  AuthNotifier(this._ref, this._repository)
+    : super(const AsyncValue.data(null));
 
   // ==========================================================
   // Login
@@ -93,13 +100,9 @@ class AuthNotifier extends StateNotifier<AsyncValue<UserModel?>> {
         occupation: occupation,
       );
 
-      // Immediately update the global auth/profile state.
       state = AsyncValue.data(updatedUser);
     } catch (e, stackTrace) {
       state = AsyncValue.error(e, stackTrace);
-
-      // Let the Edit Profile screen handle the failure
-      // and show an appropriate message.
       rethrow;
     }
   }
@@ -111,6 +114,14 @@ class AuthNotifier extends StateNotifier<AsyncValue<UserModel?>> {
   Future<void> logout() async {
     await _repository.logout();
 
+    // Clear all account-specific cached/provider data.
+    _ref.invalidate(financialHealthProvider);
+    _ref.invalidate(dashboardProvider);
+    _ref.invalidate(budgetProvider);
+    _ref.invalidate(goalProvider);
+    _ref.invalidate(transactionProvider);
+
+    // Finally clear authenticated user.
     state = const AsyncValue.data(null);
   }
 }
