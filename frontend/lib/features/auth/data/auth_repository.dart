@@ -47,6 +47,31 @@ class AuthRepository {
     return UserModel.fromJson(userJson);
   }
 
+  Future<UserModel> updateProfile({
+    required String fullName,
+    required int age,
+    required String gender,
+    required String region,
+    required String occupation,
+  }) async {
+    final response = await _dio.patch(
+      ApiEndpoints.profile,
+      data: {
+        'full_name': fullName,
+        'age': age,
+        'gender': gender,
+        'region': region,
+        'occupation': occupation,
+      },
+    );
+
+    final responseData = response.data as Map<String, dynamic>;
+
+    final userJson = responseData['data'] as Map<String, dynamic>;
+
+    return UserModel.fromJson(userJson);
+  }
+
   Future<void> logout() async {
     await SecureStorage.deleteAccessToken();
   }

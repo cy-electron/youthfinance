@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:youthfinance/features/transactions/model/transaction_model.dart';
 import 'package:youthfinance/features/transactions/model/transaction_provider.dart';
 
@@ -8,7 +9,13 @@ import '../../../../design_system/typography/section_header.dart';
 import '../../../transactions/presentation/widgets/transaction_tile.dart';
 
 class RecentTransactionsSection extends ConsumerWidget {
-  const RecentTransactionsSection({super.key});
+  final VoidCallback onNavigateToTransactions;
+
+  const RecentTransactionsSection({
+    super.key,
+    required this.onNavigateToTransactions,
+    required Null Function() onViewAll,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -20,9 +27,7 @@ class RecentTransactionsSection extends ConsumerWidget {
         SectionHeader(
           title: "Recent Transactions",
           actionText: "View All",
-          onPressed: () {
-            // Navigation to Transactions can be connected later.
-          },
+          onPressed: onNavigateToTransactions,
         ),
 
         const SizedBox(height: 16),

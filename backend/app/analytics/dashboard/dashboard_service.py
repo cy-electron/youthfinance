@@ -14,24 +14,35 @@ class DashboardService:
 
     @staticmethod
     def get_dashboard_summary():
+
         user_id = get_jwt_identity()
 
         today = date.today()
 
         total_income = (
-            db.session.query(func.coalesce(func.sum(Income.amount), 0))
-            .filter(Income.user_id == user_id)
+            db.session.query(
+                func.coalesce(func.sum(Income.amount), 0)
+            )
+            .filter(
+                Income.user_id == user_id
+            )
             .scalar()
         )
 
         total_expense = (
-            db.session.query(func.coalesce(func.sum(Expense.amount), 0))
-            .filter(Expense.user_id == user_id)
+            db.session.query(
+                func.coalesce(func.sum(Expense.amount), 0)
+            )
+            .filter(
+                Expense.user_id == user_id
+            )
             .scalar()
         )
 
         monthly_budget = (
-            db.session.query(func.coalesce(func.sum(Budget.amount), 0))
+            db.session.query(
+                func.coalesce(func.sum(Budget.amount), 0)
+            )
             .filter(
                 Budget.user_id == user_id,
                 Budget.month == today.month,
@@ -53,7 +64,9 @@ class DashboardService:
         return {
             "total_income": float(total_income),
             "total_expense": float(total_expense),
-            "net_savings": float(total_income - total_expense),
+            "net_savings": float(
+                total_income - total_expense
+            ),
             "monthly_budget": float(monthly_budget),
             "active_goals": active_goals,
             "completed_goals": completed_goals

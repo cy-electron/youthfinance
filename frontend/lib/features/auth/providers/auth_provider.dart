@@ -17,6 +17,10 @@ class AuthNotifier extends StateNotifier<AsyncValue<UserModel?>> {
 
   AuthNotifier(this._repository) : super(const AsyncValue.data(null));
 
+  // ==========================================================
+  // Login
+  // ==========================================================
+
   Future<void> login({required String email, required String password}) async {
     state = const AsyncValue.loading();
 
@@ -28,6 +32,10 @@ class AuthNotifier extends StateNotifier<AsyncValue<UserModel?>> {
       state = AsyncValue.error(e, stackTrace);
     }
   }
+
+  // ==========================================================
+  // Register
+  // ==========================================================
 
   Future<void> register({
     required String fullName,
@@ -49,6 +57,10 @@ class AuthNotifier extends StateNotifier<AsyncValue<UserModel?>> {
     }
   }
 
+  // ==========================================================
+  // Load current profile
+  // ==========================================================
+
   Future<void> loadProfile() async {
     state = const AsyncValue.loading();
 
@@ -60,6 +72,41 @@ class AuthNotifier extends StateNotifier<AsyncValue<UserModel?>> {
       state = AsyncValue.error(e, stackTrace);
     }
   }
+
+  // ==========================================================
+  // Update current profile
+  // ==========================================================
+
+  Future<void> updateProfile({
+    required String fullName,
+    required int age,
+    required String gender,
+    required String region,
+    required String occupation,
+  }) async {
+    try {
+      final updatedUser = await _repository.updateProfile(
+        fullName: fullName,
+        age: age,
+        gender: gender,
+        region: region,
+        occupation: occupation,
+      );
+
+      // Immediately update the global auth/profile state.
+      state = AsyncValue.data(updatedUser);
+    } catch (e, stackTrace) {
+      state = AsyncValue.error(e, stackTrace);
+
+      // Let the Edit Profile screen handle the failure
+      // and show an appropriate message.
+      rethrow;
+    }
+  }
+
+  // ==========================================================
+  // Logout
+  // ==========================================================
 
   Future<void> logout() async {
     await _repository.logout();

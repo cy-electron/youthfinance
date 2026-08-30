@@ -13,7 +13,14 @@ class CreateGoalSchema(Schema):
         validate=validate.Range(min=1)
     )
 
-    current_amount = fields.Decimal(
+    # --------------------------------------------------
+    # INITIAL SAVING
+    # --------------------------------------------------
+    # This is NOT directly stored as arbitrary goal money.
+    # GoalService will create a Saving record for it.
+    # --------------------------------------------------
+
+    initial_saving_amount = fields.Decimal(
         load_default=0,
         validate=validate.Range(min=0)
     )

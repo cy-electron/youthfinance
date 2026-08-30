@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:youthfinance/features/goals/model/goal_model.dart';
+
+import '../../model/goal_model.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -9,10 +10,6 @@ import '../../../../design_system/cards/app_card.dart';
 class GoalCard extends StatelessWidget {
   final GoalModel goal;
 
-  // Removed the extra required params (title, icon, currentAmount,
-  // targetAmount, dueDate, status) that were on the constructor but
-  // never stored or used anywhere in build() — everything this widget
-  // needs already comes from `goal`.
   const GoalCard({super.key, required this.goal});
 
   Color get statusColor {
@@ -31,29 +28,12 @@ class GoalCard extends StatelessWidget {
     }
   }
 
-  String get statusText {
-    switch (goal.status) {
-      case GoalStatus.onTrack:
-        return "ON TRACK";
-
-      case GoalStatus.attention:
-        return "NEEDS ATTENTION";
-
-      case GoalStatus.delayed:
-        return "DELAYED";
-
-      case GoalStatus.completed:
-        return "COMPLETED";
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          //---------------- HEADER ----------------//
           Row(
             children: [
               CircleAvatar(
@@ -73,7 +53,7 @@ class GoalCard extends StatelessWidget {
                     const SizedBox(height: 4),
 
                     Text(
-                      statusText,
+                      goal.statusText,
                       style: AppTextStyles.caption.copyWith(
                         color: statusColor,
                         fontWeight: FontWeight.w600,
@@ -86,11 +66,11 @@ class GoalCard extends StatelessWidget {
               Column(
                 children: [
                   Text(
-                    "${(goal.progress * 100).round()}%",
+                    '${(goal.progress * 100).round()}%',
                     style: AppTextStyles.cardTitle,
                   ),
 
-                  Text("Progress", style: AppTextStyles.caption),
+                  Text('Progress', style: AppTextStyles.caption),
                 ],
               ),
             ],
@@ -113,10 +93,20 @@ class GoalCard extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _Stat("Saved", "₹${goal.saved} / ₹${goal.target}"),
+                child: _Stat(
+                  'Saved',
+                  '₹${_formatAmount(goal.currentAmount)} / ₹${_formatAmount(goal.targetAmount)}',
+                ),
               ),
 
-              Expanded(child: _Stat("Time Left", "${goal.monthsLeft} Months")),
+              Expanded(
+                child: _Stat(
+                  'Time Left',
+                  goal.monthsLeft == 0
+                      ? 'Overdue'
+                      : '${goal.monthsLeft} Months',
+                ),
+              ),
             ],
           ),
 
@@ -124,15 +114,20 @@ class GoalCard extends StatelessWidget {
 
           Row(
             children: [
-              Expanded(child: _Stat("Monthly", "₹${goal.monthlyContribution}")),
+              Expanded(
+                child: _Stat(
+                  'Monthly Needed',
+                  '₹${_formatAmount(goal.requiredMonthlyAmount)}',
+                ),
+              ),
 
-              Expanded(child: _Stat("Finish", goal.expectedFinish)),
+              Expanded(child: _Stat('Finish', goal.expectedFinish)),
             ],
           ),
 
           const SizedBox(height: AppSpacing.lg),
 
-          Divider(),
+          const Divider(),
 
           const SizedBox(height: AppSpacing.sm),
 
@@ -153,6 +148,14 @@ class GoalCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  static String _formatAmount(double amount) {
+    if (amount == amount.roundToDouble()) {
+      return amount.toInt().toString();
+    }
+
+    return amount.toStringAsFixed(2);
   }
 }
 

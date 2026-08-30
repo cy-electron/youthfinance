@@ -15,6 +15,7 @@ from app.common.error_handlers import register_error_handlers
 from app.analytics.goal_readiness.goal_readiness_routes import goal_readiness_bp
 from app.analytics.spending_analysis.spending_analysis_routes import analysis_bp
 from app.analytics.financial_planner.planner_routes import planner_bp
+from app.modules.savings.savings_routes import saving_bp
 from app.modules.investment.investment_routes import investment_bp
 from app.modules.fun_fund.fun_fund_routes import fun_fund_bp
 from app.extensions import (
@@ -43,6 +44,7 @@ def create_app():
     app.register_blueprint(budget_bp)
     app.register_blueprint(investment_bp)
     app.register_blueprint(fun_fund_bp)
+    app.register_blueprint(saving_bp)   
     app.register_blueprint(goal_bp)
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(financial_health_bp)
