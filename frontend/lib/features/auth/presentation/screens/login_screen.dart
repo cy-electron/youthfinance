@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import 'package:youthfinance/features/auth/data/auth_models.dart';
 import 'package:youthfinance/features/auth/providers/auth_provider.dart';
 
-        class LoginScreen extends ConsumerStatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
@@ -31,7 +32,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         loading: () {},
         error: (error, stackTrace) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
+            const SnackBar(
               content: Text(
                 'Login failed. Please check your email and password.',
               ),
@@ -79,6 +80,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             children: [
               const Spacer(),
 
+              // ==================================================
+              // Header
+              // ==================================================
               Text(
                 'Welcome Back',
                 style: Theme.of(context).textTheme.headlineMedium,
@@ -93,21 +97,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
               const Spacer(),
 
+              // ==================================================
+              // Email
+              // ==================================================
               TextField(
                 controller: _emailController,
+                enabled: !isLoading,
                 keyboardType: TextInputType.emailAddress,
                 textInputAction: TextInputAction.next,
-                enabled: !isLoading,
                 decoration: const InputDecoration(labelText: 'Email'),
               ),
 
               const SizedBox(height: 16),
 
+              // ==================================================
+              // Password
+              // ==================================================
               TextField(
                 controller: _passwordController,
+                enabled: !isLoading,
                 obscureText: true,
                 textInputAction: TextInputAction.done,
-                enabled: !isLoading,
                 onSubmitted: (_) {
                   if (!isLoading) {
                     _login();
@@ -118,6 +128,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
               const SizedBox(height: 24),
 
+              // ==================================================
+              // Login Button
+              // ==================================================
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -133,6 +146,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
 
               const SizedBox(height: 16),
+
+              // ==================================================
+              // Signup
+              // ==================================================
+              Center(
+                child: TextButton(
+                  onPressed: isLoading
+                      ? null
+                      : () {
+                          context.go('/signup');
+                        },
+                  child: const Text("Don't have an account? Sign Up"),
+                ),
+              ),
+
+              const Spacer(),
             ],
           ),
         ),
