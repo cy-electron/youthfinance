@@ -1,7 +1,7 @@
 class ApiEndpoints {
   ApiEndpoints._();
 
-  static const String baseUrl = 'http://192.168.0.107:5000';
+  static const String baseUrl = 'https://youthfinance.onrender.com';
 
   // Health
   static const String health = '/';
