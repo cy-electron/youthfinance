@@ -1,0 +1,9 @@
+.git
+.gitignore
+.dart_tool
+.idea
+.vscode
+build
+.env
+.env.*
+*.iml
