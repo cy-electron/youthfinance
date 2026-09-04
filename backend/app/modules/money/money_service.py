@@ -17,11 +17,19 @@ except ImportError:
 
 class MoneyService:
 
+    # ============================================================
+    # MONEY BUCKET TYPES
+    # ============================================================
+
     GENERAL = "general"
     GOAL = "goal"
     EMERGENCY = "emergency"
     BUDGET = "budget"
     FUN_FUND = "fun_fund"
+
+    # ============================================================
+    # LEDGER ENTRY TYPES
+    # ============================================================
 
     ALLOCATION = "allocation"
     RELEASE = "release"
@@ -79,7 +87,7 @@ class MoneyService:
     def get_bucket_balance(
         bucket_type,
         bucket_id=None,
-        user_id=None
+        user_id=None,
     ):
         if user_id is None:
             user_id = MoneyService._user_id()
@@ -88,7 +96,7 @@ class MoneyService:
             db.session.query(
                 db.func.coalesce(
                     db.func.sum(MoneyAllocation.amount),
-                    0
+                    0,
                 )
             )
             .filter(
@@ -118,8 +126,12 @@ class MoneyService:
     def _validate_bucket(
         user_id,
         bucket_type,
-        bucket_id=None
+        bucket_id=None,
     ):
+        # --------------------------------------------------------
+        # GENERAL
+        # --------------------------------------------------------
+
         if bucket_type == MoneyService.GENERAL:
             if bucket_id is not None:
                 raise ValidationException(
@@ -127,12 +139,20 @@ class MoneyService:
                 )
             return
 
+        # --------------------------------------------------------
+        # EMERGENCY FUND
+        # --------------------------------------------------------
+
         if bucket_type == MoneyService.EMERGENCY:
             if bucket_id is not None:
                 raise ValidationException(
                     "Emergency Fund cannot have a bucket ID."
                 )
             return
+
+        # --------------------------------------------------------
+        # GOAL
+        # --------------------------------------------------------
 
         if bucket_type == MoneyService.GOAL:
 
@@ -143,7 +163,7 @@ class MoneyService:
 
             goal = Goal.query.filter_by(
                 id=bucket_id,
-                user_id=user_id
+                user_id=user_id,
             ).first()
 
             if not goal:
@@ -152,6 +172,10 @@ class MoneyService:
                 )
 
             return
+
+        # --------------------------------------------------------
+        # BUDGET
+        # --------------------------------------------------------
 
         if bucket_type == MoneyService.BUDGET:
 
@@ -162,7 +186,7 @@ class MoneyService:
 
             budget = Budget.query.filter_by(
                 id=bucket_id,
-                user_id=user_id
+                user_id=user_id,
             ).first()
 
             if not budget:
@@ -171,6 +195,10 @@ class MoneyService:
                 )
 
             return
+
+        # --------------------------------------------------------
+        # FUN FUND
+        # --------------------------------------------------------
 
         if bucket_type == MoneyService.FUN_FUND:
 
@@ -186,7 +214,7 @@ class MoneyService:
 
             fund = FunFund.query.filter_by(
                 id=bucket_id,
-                user_id=user_id
+                user_id=user_id,
             ).first()
 
             if not fund:
@@ -210,7 +238,7 @@ class MoneyService:
         return MoneyService.get_bucket_balance(
             bucket_type=MoneyService.GENERAL,
             bucket_id=None,
-            user_id=user_id
+            user_id=user_id,
         )
 
     # ============================================================
@@ -237,6 +265,9 @@ class MoneyService:
 
         General -> -₹3,000
         Goal    -> +₹3,000
+
+        Allocation does not create money.
+        It only redistributes existing controlled money.
         """
 
         user_id = MoneyService._user_id()
@@ -250,7 +281,7 @@ class MoneyService:
         MoneyService._validate_bucket(
             user_id,
             destination_type,
-            destination_id
+            destination_id,
         )
 
         general_balance = MoneyService.get_general_balance(
@@ -264,6 +295,7 @@ class MoneyService:
                 "available to allocate."
             )
 
+        # General loses money.
         MoneyService._add_entry(
             user_id=user_id,
             bucket_type=MoneyService.GENERAL,
@@ -275,6 +307,7 @@ class MoneyService:
             description=description,
         )
 
+        # Destination receives the same money.
         MoneyService._add_entry(
             user_id=user_id,
             bucket_type=destination_type,
@@ -297,14 +330,16 @@ class MoneyService:
         source_type,
         amount,
         source_id=None,
-        destination_type=MoneyService.GENERAL,
+        destination_type="general",
         destination_id=None,
         description=None,
         reference_type=None,
         reference_id=None,
     ):
         """
-        Move money from one controlled allocation back to General.
+        Move money from one controlled allocation to another.
+
+        By default, released money goes back to General Savings.
 
         Example:
 
@@ -326,19 +361,19 @@ class MoneyService:
         MoneyService._validate_bucket(
             user_id,
             source_type,
-            source_id
+            source_id,
         )
 
         MoneyService._validate_bucket(
             user_id,
             destination_type,
-            destination_id
+            destination_id,
         )
 
         source_balance = MoneyService.get_bucket_balance(
             source_type,
             source_id,
-            user_id
+            user_id,
         )
 
         if amount > source_balance:
@@ -346,6 +381,7 @@ class MoneyService:
                 "Insufficient money in the selected allocation."
             )
 
+        # Source loses money.
         MoneyService._add_entry(
             user_id=user_id,
             bucket_type=source_type,
@@ -357,6 +393,7 @@ class MoneyService:
             description=description,
         )
 
+        # Destination receives money.
         MoneyService._add_entry(
             user_id=user_id,
             bucket_type=destination_type,
@@ -379,7 +416,7 @@ class MoneyService:
         bucket_type,
         amount,
         bucket_id=None,
-        entry_type=EXPENSE,
+        entry_type="expense",
         reference_type=None,
         reference_id=None,
         description=None,
@@ -404,13 +441,13 @@ class MoneyService:
         MoneyService._validate_bucket(
             user_id,
             bucket_type,
-            bucket_id
+            bucket_id,
         )
 
         balance = MoneyService.get_bucket_balance(
             bucket_type,
             bucket_id,
-            user_id
+            user_id,
         )
 
         if amount > balance:
@@ -429,7 +466,7 @@ class MoneyService:
             description=description,
         )
 
-        # ============================================================
+    # ============================================================
     # SPEND MONEY
     # ============================================================
 
@@ -473,14 +510,17 @@ class MoneyService:
                 "Expense reference is required."
             )
 
-        # --------------------------------------------------------
+        # ========================================================
         # EXPLICIT SOURCE
-        # --------------------------------------------------------
+        # ========================================================
 
         if source_type is not None:
 
             # Fun Fund must always be explicit.
-            if source_type == MoneyService.FUN_FUND and source_id is None:
+            if (
+                source_type == MoneyService.FUN_FUND
+                and source_id is None
+            ):
                 raise ValidationException(
                     "Fun Fund expenses require a Fun Fund ID."
                 )
@@ -488,13 +528,13 @@ class MoneyService:
             MoneyService._validate_bucket(
                 user_id,
                 source_type,
-                source_id
+                source_id,
             )
 
             balance = MoneyService.get_bucket_balance(
                 source_type,
                 source_id,
-                user_id
+                user_id,
             )
 
             if amount > balance:
@@ -521,21 +561,18 @@ class MoneyService:
                 }
             ]
 
-        # --------------------------------------------------------
+        # ========================================================
         # AUTOMATIC NORMAL EXPENSE FUNDING
         #
         # Budget -> General -> Goal -> Emergency
-        # --------------------------------------------------------
+        # ========================================================
 
         remaining = amount
         funding = []
 
-        # --------------------------------------------------------
+        # ========================================================
         # 1. BUDGET
-        #
-        # Prefer a budget matching the expense category.
-        # Only use budgets belonging to this user.
-        # --------------------------------------------------------
+        # ========================================================
 
         budgets_query = Budget.query.filter_by(
             user_id=user_id
@@ -544,18 +581,21 @@ class MoneyService:
         budgets = budgets_query.order_by(
             Budget.year.desc(),
             Budget.month.desc(),
-            Budget.id.desc()
+            Budget.id.desc(),
         ).all()
 
         # Put category-matching budgets first.
         if category:
+
             matching = [
-                budget for budget in budgets
+                budget
+                for budget in budgets
                 if budget.category.lower() == category.lower()
             ]
 
             non_matching = [
-                budget for budget in budgets
+                budget
+                for budget in budgets
                 if budget.category.lower() != category.lower()
             ]
 
@@ -569,7 +609,7 @@ class MoneyService:
             balance = MoneyService.get_bucket_balance(
                 MoneyService.BUDGET,
                 budget.id,
-                user_id
+                user_id,
             )
 
             if balance <= 0:
@@ -577,7 +617,7 @@ class MoneyService:
 
             amount_from_budget = min(
                 remaining,
-                balance
+                balance,
             )
 
             MoneyService.debit_bucket(
@@ -600,9 +640,9 @@ class MoneyService:
 
             remaining -= amount_from_budget
 
-        # --------------------------------------------------------
+        # ========================================================
         # 2. GENERAL
-        # --------------------------------------------------------
+        # ========================================================
 
         if remaining > 0:
 
@@ -612,7 +652,7 @@ class MoneyService:
 
             amount_from_general = min(
                 remaining,
-                general_balance
+                general_balance,
             )
 
             if amount_from_general > 0:
@@ -637,9 +677,9 @@ class MoneyService:
 
                 remaining -= amount_from_general
 
-        # --------------------------------------------------------
+        # ========================================================
         # 3. GOALS
-        # --------------------------------------------------------
+        # ========================================================
 
         if remaining > 0:
 
@@ -657,7 +697,7 @@ class MoneyService:
                 balance = MoneyService.get_bucket_balance(
                     MoneyService.GOAL,
                     goal.id,
-                    user_id
+                    user_id,
                 )
 
                 if balance <= 0:
@@ -665,7 +705,7 @@ class MoneyService:
 
                 amount_from_goal = min(
                     remaining,
-                    balance
+                    balance,
                 )
 
                 MoneyService.debit_bucket(
@@ -688,21 +728,21 @@ class MoneyService:
 
                 remaining -= amount_from_goal
 
-        # --------------------------------------------------------
+        # ========================================================
         # 4. EMERGENCY FUND
-        # --------------------------------------------------------
+        # ========================================================
 
         if remaining > 0:
 
             emergency_balance = MoneyService.get_bucket_balance(
                 MoneyService.EMERGENCY,
                 None,
-                user_id
+                user_id,
             )
 
             amount_from_emergency = min(
                 remaining,
-                emergency_balance
+                emergency_balance,
             )
 
             if amount_from_emergency > 0:
@@ -727,9 +767,9 @@ class MoneyService:
 
                 remaining -= amount_from_emergency
 
-        # --------------------------------------------------------
+        # ========================================================
         # NOT ENOUGH MONEY
-        # --------------------------------------------------------
+        # ========================================================
 
         if remaining > 0:
 
@@ -752,7 +792,7 @@ class MoneyService:
         """
         Reverse the currently active funding of an expense.
 
-        Only the latest unreversed expense entries are reversed.
+        Only the currently unreversed expense entries are reversed.
         Historical expense entries remain in the ledger for audit.
         """
 
@@ -772,10 +812,9 @@ class MoneyService:
                 "No money movement was found for this expense."
             )
 
-        # --------------------------------------------------------
-        # Calculate how much of each bucket has already been
-        # returned through RELEASE entries for this expense.
-        # --------------------------------------------------------
+        # ========================================================
+        # CALCULATE RELEASED AMOUNTS
+        # ========================================================
 
         release_entries = MoneyAllocation.query.filter_by(
             user_id=user_id,
@@ -787,26 +826,31 @@ class MoneyService:
         released_by_bucket = {}
 
         for entry in release_entries:
+
             key = (
                 entry.bucket_type,
-                entry.bucket_id
+                entry.bucket_id,
             )
 
             released_by_bucket[key] = (
-                released_by_bucket.get(key, Decimal("0.00"))
+                released_by_bucket.get(
+                    key,
+                    Decimal("0.00"),
+                )
                 + MoneyService._decimal(entry.amount)
             )
 
-        # --------------------------------------------------------
-        # Determine currently unreversed expense amounts.
-        # --------------------------------------------------------
+        # ========================================================
+        # DETERMINE CURRENTLY ACTIVE EXPENSE ENTRIES
+        # ========================================================
 
         active_entries = []
 
         for entry in entries:
+
             key = (
                 entry.bucket_type,
-                entry.bucket_id
+                entry.bucket_id,
             )
 
             spent = abs(
@@ -815,16 +859,17 @@ class MoneyService:
 
             already_released = released_by_bucket.get(
                 key,
-                Decimal("0.00")
+                Decimal("0.00"),
             )
 
             remaining = spent - already_released
 
             if remaining > 0:
+
                 active_entries.append(
                     (
                         entry,
-                        remaining
+                        remaining,
                     )
                 )
 
@@ -833,27 +878,28 @@ class MoneyService:
                 "This expense has already been reversed."
             )
 
-        # --------------------------------------------------------
+        # ========================================================
         # SAFETY CHECK
-        # --------------------------------------------------------
+        # ========================================================
 
         for entry, amount_to_reverse in active_entries:
 
             current_balance = MoneyService.get_bucket_balance(
                 entry.bucket_type,
                 entry.bucket_id,
-                user_id
+                user_id,
             )
 
             if amount_to_reverse > current_balance:
+
                 raise ValidationException(
                     "This expense cannot be reversed because "
                     "the money has already been used elsewhere."
                 )
 
-        # --------------------------------------------------------
+        # ========================================================
         # RETURN MONEY TO EXACT ORIGINAL BUCKETS
-        # --------------------------------------------------------
+        # ========================================================
 
         reversed_funding = []
 
@@ -877,8 +923,12 @@ class MoneyService:
                     "amount": amount_to_reverse,
                 }
             )
-    
+
         return reversed_funding
+
+    # ============================================================
+    # TOTAL CONTROLLED MONEY
+    # ============================================================
 
     @staticmethod
     def get_total_allocated(user_id=None):
@@ -890,7 +940,7 @@ class MoneyService:
             db.session.query(
                 db.func.coalesce(
                     db.func.sum(MoneyAllocation.amount),
-                    0
+                    0,
                 )
             )
             .filter(
@@ -914,25 +964,25 @@ class MoneyService:
         general = MoneyService.get_bucket_balance(
             MoneyService.GENERAL,
             None,
-            user_id
+            user_id,
         )
 
         emergency = MoneyService.get_bucket_balance(
             MoneyService.EMERGENCY,
             None,
-            user_id
+            user_id,
         )
 
         goal_total = (
             db.session.query(
                 db.func.coalesce(
                     db.func.sum(MoneyAllocation.amount),
-                    0
+                    0,
                 )
             )
             .filter(
                 MoneyAllocation.user_id == user_id,
-                MoneyAllocation.bucket_type == MoneyService.GOAL
+                MoneyAllocation.bucket_type == MoneyService.GOAL,
             )
             .scalar()
         )
@@ -941,12 +991,12 @@ class MoneyService:
             db.session.query(
                 db.func.coalesce(
                     db.func.sum(MoneyAllocation.amount),
-                    0
+                    0,
                 )
             )
             .filter(
                 MoneyAllocation.user_id == user_id,
-                MoneyAllocation.bucket_type == MoneyService.BUDGET
+                MoneyAllocation.bucket_type == MoneyService.BUDGET,
             )
             .scalar()
         )
@@ -955,12 +1005,12 @@ class MoneyService:
             db.session.query(
                 db.func.coalesce(
                     db.func.sum(MoneyAllocation.amount),
-                    0
+                    0,
                 )
             )
             .filter(
                 MoneyAllocation.user_id == user_id,
-                MoneyAllocation.bucket_type == MoneyService.FUN_FUND
+                MoneyAllocation.bucket_type == MoneyService.FUN_FUND,
             )
             .scalar()
         )
