@@ -6,6 +6,7 @@ from sqlalchemy import func
 from app.extensions import db
 from app.modules.investment.investment_model import Investment
 from app.modules.fun_fund.fun_fund_model import FunFund
+from app.modules.money.money_service import MoneyService
 from app.analytics.dashboard.dashboard_service import DashboardService
 from app.modules.goal.goal_model import Goal
 from app.modules.income.income_model import Income
@@ -582,8 +583,6 @@ class FinancialHealthService:
         end_date=None
     ):
 
-        savings = dashboard["net_savings"]
-
         query = db.session.query(
             func.extract("year", Expense.date),
             func.extract("month", Expense.date),
@@ -612,20 +611,23 @@ class FinancialHealthService:
 
         average_monthly_expense = (
             sum(float(month[2]) for month in monthly_expenses)
-            /
-            len(monthly_expenses)
+            / len(monthly_expenses)
         )
 
         if average_monthly_expense <= 0:
             return 0
 
-        months = (
-            savings / average_monthly_expense
+        emergency_balance = MoneyService.get_bucket_balance(
+            MoneyService.EMERGENCY,
+            user_id=user_id
         )
 
-        max_score = FINANCIAL_HEALTH_WEIGHTS[
-            "emergency_fund"
-        ]
+        months = (
+            float(emergency_balance)
+            / average_monthly_expense
+        )
+
+        max_score = FINANCIAL_HEALTH_WEIGHTS["emergency_fund"]
 
         if months >= 6:
             return max_score
