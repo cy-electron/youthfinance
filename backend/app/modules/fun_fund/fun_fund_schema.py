@@ -1,34 +1,28 @@
 from marshmallow import Schema, fields, validate
-from app.common.custom_validators import positive_amount, non_negative_amount
 
-class FunFundSchema(Schema):
+from app.common.custom_validators import positive_amount
 
-    title = fields.String(required=True)
+
+class CreateFunFundSchema(Schema):
+
+    budget_id = fields.Integer(
+        required=True
+    )
+
+    title = fields.String(
+        required=True,
+        validate=validate.Length(min=2, max=100)
+    )
 
     target_amount = fields.Decimal(
-    required=True,
-    as_string=True,
-    validate=positive_amount
-)
-
-    current_amount = fields.Decimal(
-    required=False,
-    as_string=True,
-    validate=non_negative_amount
-)
+        required=True,
+        as_string=True,
+        validate=positive_amount
+    )
 
     target_date = fields.Date(
         required=False,
         allow_none=True
-    )
-
-    status = fields.String(
-        required=False,
-        validate=validate.OneOf([
-            "Active",
-            "Completed",
-            "Cancelled"
-        ])
     )
 
     notes = fields.String(
@@ -37,6 +31,21 @@ class FunFundSchema(Schema):
     )
 
 
-fun_fund_schema = FunFundSchema()
+class UpdateFunFundSchema(Schema):
 
-fun_fund_update_schema = FunFundSchema(partial=True)
+    title = fields.String(
+        validate=validate.Length(min=2, max=100)
+    )
+
+    target_amount = fields.Decimal(
+        as_string=True,
+        validate=positive_amount
+    )
+
+    target_date = fields.Date(
+        allow_none=True
+    )
+
+    notes = fields.String(
+        allow_none=True
+    )
