@@ -2,6 +2,7 @@ from marshmallow import Schema, fields, validate
 
 
 class CreateExpenseSchema(Schema):
+
     category = fields.Str(
         required=True,
         validate=validate.Length(min=2, max=100)
@@ -20,8 +21,26 @@ class CreateExpenseSchema(Schema):
         validate=validate.Length(max=500)
     )
 
+    source_type = fields.Str(
+        required=False,
+        allow_none=True,
+        validate=validate.OneOf([
+            "budget",
+            "general",
+            "goal",
+            "emergency",
+            "fun_fund"
+        ])
+    )
+
+    source_id = fields.Integer(
+        required=False,
+        allow_none=True
+    )
+
 
 class UpdateExpenseSchema(Schema):
+
     category = fields.Str(
         validate=validate.Length(min=2, max=100)
     )
@@ -35,4 +54,19 @@ class UpdateExpenseSchema(Schema):
     description = fields.Str(
         allow_none=True,
         validate=validate.Length(max=500)
+    )
+
+    source_type = fields.Str(
+        allow_none=True,
+        validate=validate.OneOf([
+            "budget",
+            "general",
+            "goal",
+            "emergency",
+            "fun_fund"
+        ])
+    )
+
+    source_id = fields.Integer(
+        allow_none=True 
     )

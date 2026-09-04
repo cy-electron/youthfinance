@@ -14,18 +14,28 @@ class FunFund(BaseModel):
         nullable=False
     )
 
+    # Parent monthly budget
+    budget_id = db.Column(
+        db.Integer,
+        db.ForeignKey("budgets.id"),
+        nullable=False
+    )
+
     title = db.Column(
         db.String(100),
         nullable=False
     )
 
+    # Maximum amount intended for this Fun Fund
     target_amount = db.Column(
         Numeric(12, 2),
         nullable=False
     )
 
+    # Amount currently allocated from the parent Budget
     current_amount = db.Column(
         Numeric(12, 2),
+        nullable=False,
         default=0
     )
 
@@ -42,16 +52,47 @@ class FunFund(BaseModel):
     notes = db.Column(
         db.Text
     )
+
+    user = db.relationship(
+        "User",
+        backref=db.backref(
+            "fun_funds",
+            lazy=True,
+            cascade="all, delete-orphan"
+        )
+    )
+
+    budget = db.relationship(
+        "Budget",
+        backref=db.backref(
+            "fun_funds",
+            lazy=True
+        )
+    )
+
     def to_dict(self):
         return {
             "id": self.id,
             "user_id": self.user_id,
+            "budget_id": self.budget_id,
             "title": self.title,
             "target_amount": float(self.target_amount),
-            "current_amount": float(self.current_amount) if self.current_amount is not None else None,
-            "target_date": self.target_date.isoformat() if self.target_date else None,
+            "current_amount": float(self.current_amount),
+            "target_date": (
+                self.target_date.isoformat()
+                if self.target_date
+                else None
+            ),
             "status": self.status,
             "notes": self.notes,
-            "created_at": self.created_at.isoformat() if self.created_at else None,
-            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+            "created_at": (
+                self.created_at.isoformat()
+                if self.created_at
+                else None
+            ),
+            "updated_at": (
+                self.updated_at.isoformat()
+                if self.updated_at
+                else None
+            ),
         }
