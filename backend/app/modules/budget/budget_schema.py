@@ -10,7 +10,7 @@ class CreateBudgetSchema(Schema):
 
     amount = fields.Decimal(
         required=True,
-        validate=validate.Range(min=1)
+        validate=validate.Range(min=0.01)
     )
 
     month = fields.Int(
@@ -31,7 +31,7 @@ class UpdateBudgetSchema(Schema):
     )
 
     amount = fields.Decimal(
-        validate=validate.Range(min=1)
+        validate=validate.Range(min=0.01)
     )
 
     month = fields.Int(

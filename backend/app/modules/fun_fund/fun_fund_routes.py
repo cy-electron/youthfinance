@@ -7,8 +7,8 @@ from app.common.responses import success_response
 from app.common.validators import validate_schema
 
 from app.modules.fun_fund.fun_fund_schema import (
-    fun_fund_schema,
-    fun_fund_update_schema
+    CreateFunFundSchema,
+    UpdateFunFundSchema
 )
 
 from app.modules.fun_fund.fun_fund_service import (
@@ -27,7 +27,7 @@ fun_fund_bp = Blueprint(
 def create():
 
     data = validate_schema(
-        fun_fund_schema,
+        CreateFunFundSchema,
         request.json
     )
 
@@ -35,7 +35,7 @@ def create():
 
     return success_response(
         data=fund.to_dict(),
-        message="Fun Fund created successfully."
+        message="Fun Fund created successfully."    
     )
 
 
@@ -68,7 +68,7 @@ def get_by_id(fun_fund_id):
 def update(fun_fund_id):
 
     data = validate_schema(
-        fun_fund_update_schema,
+        UpdateFunFundSchema,
         request.json
     )
 

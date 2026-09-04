@@ -13,19 +13,14 @@ class CreateGoalSchema(Schema):
         validate=validate.Range(min=1)
     )
 
-    # --------------------------------------------------
-    # INITIAL SAVING
-    # --------------------------------------------------
-    # This is NOT directly stored as arbitrary goal money.
-    # GoalService will create a Saving record for it.
-    # --------------------------------------------------
-
     initial_saving_amount = fields.Decimal(
         load_default=0,
         validate=validate.Range(min=0)
     )
 
-    target_date = fields.Date(required=True)
+    target_date = fields.Date(
+        required=True
+    )
 
     description = fields.Str(
         allow_none=True,
@@ -43,15 +38,9 @@ class UpdateGoalSchema(Schema):
         validate=validate.Range(min=1)
     )
 
-    current_amount = fields.Decimal(
-        validate=validate.Range(min=0)
-    )
-
     target_date = fields.Date()
 
     description = fields.Str(
         allow_none=True,
         validate=validate.Length(max=500)
     )
-
-    is_completed = fields.Boolean()
