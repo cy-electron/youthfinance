@@ -7,7 +7,8 @@ class SavingRepository {
   Future<List<SavingModel>> getSavings() async {
     final response = await _dio.get('/api/saving');
 
-    final data = response.data['data'] as List;
+    final responseData = response.data as Map<String, dynamic>;
+    final data = responseData['data'] as List<dynamic>;
 
     return data
         .map((item) => SavingModel.fromJson(item as Map<String, dynamic>))
@@ -19,6 +20,7 @@ class SavingRepository {
     required double amount,
     required DateTime date,
     String? description,
+    required String savingType,
   }) async {
     final response = await _dio.post(
       '/api/saving',
@@ -27,10 +29,13 @@ class SavingRepository {
         'amount': amount,
         'date': date.toIso8601String().split('T').first,
         'description': description,
+        'saving_type': savingType,
       },
     );
 
-    return SavingModel.fromJson(response.data['data'] as Map<String, dynamic>);
+    final responseData = response.data as Map<String, dynamic>;
+
+    return SavingModel.fromJson(responseData['data'] as Map<String, dynamic>);
   }
 
   Future<void> deleteSaving(int id) async {

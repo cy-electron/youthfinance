@@ -8,22 +8,35 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
 
-class CancelGoalSheet extends ConsumerWidget {
+class CancelGoalSheet extends ConsumerStatefulWidget {
   const CancelGoalSheet({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CancelGoalSheet> createState() => _CancelGoalSheetState();
+}
+
+class _CancelGoalSheetState extends ConsumerState<CancelGoalSheet> {
+  int? _cancellingGoalId;
+
+  @override
+  Widget build(BuildContext context) {
     final goalsAsync = ref.watch(goalProvider);
 
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
         child: goalsAsync.when(
+          // ------------------------------------------------------
+          // LOADING
+          // ------------------------------------------------------
           loading: () => const SizedBox(
             height: 200,
             child: Center(child: CircularProgressIndicator()),
           ),
 
+          // ------------------------------------------------------
+          // ERROR
+          // ------------------------------------------------------
           error: (error, stackTrace) => SizedBox(
             height: 200,
             child: Center(
@@ -31,6 +44,9 @@ class CancelGoalSheet extends ConsumerWidget {
             ),
           ),
 
+          // ------------------------------------------------------
+          // DATA
+          // ------------------------------------------------------
           data: (goals) {
             final activeGoals = goals
                 .where((goal) => !goal.isCompleted)
@@ -49,6 +65,9 @@ class CancelGoalSheet extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // ------------------------------------------------
+                // HANDLE
+                // ------------------------------------------------
                 Center(
                   child: Container(
                     width: 40,
@@ -62,6 +81,9 @@ class CancelGoalSheet extends ConsumerWidget {
 
                 const SizedBox(height: 24),
 
+                // ------------------------------------------------
+                // TITLE
+                // ------------------------------------------------
                 Text(
                   'Cancel Goal',
                   style: AppTextStyles.heading.copyWith(fontSize: 22),
@@ -78,46 +100,17 @@ class CancelGoalSheet extends ConsumerWidget {
 
                 const SizedBox(height: 24),
 
+                // ------------------------------------------------
+                // GOALS
+                // ------------------------------------------------
                 ...activeGoals.map(
                   (goal) => Padding(
                     padding: const EdgeInsets.only(bottom: AppSpacing.sm),
                     child: _CancelGoalTile(
                       goal: goal,
-                      onTap: () async {
-                        final confirmed = await _showCancelConfirmation(
-                          context,
-                          goal,
-                        );
-
-                        if (!context.mounted || !confirmed) {
-                          return;
-                        }
-
-                        try {
-                          await ref
-                              .read(goalProvider.notifier)
-                              .deleteGoal(goal.id);
-
-                          if (!context.mounted) return;
-
-                          Navigator.pop(context, true);
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Goal cancelled successfully.'),
-                              duration: Duration(seconds: 2),
-                            ),
-                          );
-                        } catch (error) {
-                          if (!context.mounted) return;
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Unable to cancel goal.'),
-                            ),
-                          );
-                        }
-                      },
+                      isCancelling: _cancellingGoalId == goal.id,
+                      disabled: _cancellingGoalId != null,
+                      onTap: () => _cancelGoal(goal),
                     ),
                   ),
                 ),
@@ -129,6 +122,53 @@ class CancelGoalSheet extends ConsumerWidget {
     );
   }
 
+  // ============================================================
+  // CANCEL GOAL
+  // ============================================================
+
+  Future<void> _cancelGoal(GoalModel goal) async {
+    if (_cancellingGoalId != null) {
+      return;
+    }
+
+    final confirmed = await _showCancelConfirmation(context, goal);
+
+    if (!mounted || !confirmed) {
+      return;
+    }
+
+    setState(() {
+      _cancellingGoalId = goal.id;
+    });
+
+    try {
+      await ref.read(goalProvider.notifier).deleteGoal(goal.id);
+
+      if (!mounted) {
+        return;
+      }
+
+      // Return success to GoalsScreen.
+      Navigator.pop(context, true);
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _cancellingGoalId = null;
+      });
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(_errorMessage(error))));
+    }
+  }
+
+  // ============================================================
+  // CONFIRMATION
+  // ============================================================
+
   Future<bool> _showCancelConfirmation(
     BuildContext context,
     GoalModel goal,
@@ -138,14 +178,14 @@ class CancelGoalSheet extends ConsumerWidget {
       builder: (dialogContext) {
         return AlertDialog(
           title: const Text('Cancel Goal?'),
-
           content: Text(
             goal.currentAmount > 0
                 ? '₹${_format(goal.currentAmount)} saved for '
-                      '${goal.title} will become unassigned savings.'
-                : 'Are you sure you want to cancel ${goal.title}?',
+                      '${goal.title} will be returned to your '
+                      'available balance.'
+                : 'Are you sure you want to cancel '
+                      '${goal.title}?',
           ),
-
           actions: [
             TextButton(
               onPressed: () {
@@ -153,7 +193,6 @@ class CancelGoalSheet extends ConsumerWidget {
               },
               child: const Text('Keep Goal'),
             ),
-
             TextButton(
               onPressed: () {
                 Navigator.pop(dialogContext, true);
@@ -171,6 +210,10 @@ class CancelGoalSheet extends ConsumerWidget {
     return result ?? false;
   }
 
+  // ============================================================
+  // HELPERS
+  // ============================================================
+
   String _format(double amount) {
     if (amount == amount.roundToDouble()) {
       return amount.toInt().toString();
@@ -178,74 +221,108 @@ class CancelGoalSheet extends ConsumerWidget {
 
     return amount.toStringAsFixed(2);
   }
+
+  String _errorMessage(Object error) {
+    return 'Unable to cancel goal. Please try again.';
+  }
 }
+
+// ================================================================
+// CANCEL GOAL TILE
+// ================================================================
 
 class _CancelGoalTile extends StatelessWidget {
   final GoalModel goal;
   final VoidCallback onTap;
+  final bool isCancelling;
+  final bool disabled;
 
-  const _CancelGoalTile({required this.goal, required this.onTap});
+  const _CancelGoalTile({
+    required this.goal,
+    required this.onTap,
+    required this.isCancelling,
+    required this.disabled,
+  });
 
   @override
   Widget build(BuildContext context) {
     final progress = goal.progress.clamp(0.0, 1.0);
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.grey.shade50,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey.shade200),
-        ),
-        child: Row(
-          children: [
-            CircleAvatar(
-              radius: 23,
-              backgroundColor: Colors.red.withValues(alpha: 0.08),
-              child: Icon(goal.icon, color: Colors.red),
-            ),
+    return Opacity(
+      opacity: disabled && !isCancelling ? 0.5 : 1.0,
+      child: InkWell(
+        onTap: disabled ? null : onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade50,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.grey.shade200),
+          ),
+          child: Row(
+            children: [
+              // --------------------------------------------------
+              // ICON
+              // --------------------------------------------------
+              CircleAvatar(
+                radius: 23,
+                backgroundColor: Colors.red.withValues(alpha: 0.08),
+                child: isCancelling
+                    ? const SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Icon(goal.icon, color: Colors.red),
+              ),
 
-            const SizedBox(width: 14),
+              const SizedBox(width: 14),
 
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(goal.title, style: AppTextStyles.cardTitle),
+              // --------------------------------------------------
+              // GOAL DETAILS
+              // --------------------------------------------------
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(goal.title, style: AppTextStyles.cardTitle),
 
-                  const SizedBox(height: 5),
+                    const SizedBox(height: 5),
 
-                  Text(
-                    '₹${_format(goal.currentAmount)} / '
-                    '₹${_format(goal.targetAmount)}',
-                    style: AppTextStyles.caption,
-                  ),
+                    Text(
+                      '₹${_format(goal.currentAmount)} / '
+                      '₹${_format(goal.targetAmount)}',
+                      style: AppTextStyles.caption,
+                    ),
 
-                  const SizedBox(height: 8),
+                    const SizedBox(height: 8),
 
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: LinearProgressIndicator(
-                      minHeight: 6,
-                      value: progress,
-                      backgroundColor: Colors.red.withValues(alpha: 0.08),
-                      valueColor: const AlwaysStoppedAnimation<Color>(
-                        Colors.red,
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: LinearProgressIndicator(
+                        minHeight: 6,
+                        value: progress,
+                        backgroundColor: Colors.red.withValues(alpha: 0.08),
+                        valueColor: const AlwaysStoppedAnimation<Color>(
+                          Colors.red,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
 
-            const SizedBox(width: 12),
+              const SizedBox(width: 12),
 
-            Icon(Icons.chevron_right, color: Colors.grey.shade500),
-          ],
+              // --------------------------------------------------
+              // ARROW
+              // --------------------------------------------------
+              if (!isCancelling)
+                Icon(Icons.chevron_right, color: Colors.grey.shade500),
+            ],
+          ),
         ),
       ),
     );

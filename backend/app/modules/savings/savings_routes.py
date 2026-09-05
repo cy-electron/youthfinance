@@ -21,11 +21,7 @@ saving_bp = Blueprint(
 @saving_bp.route("", methods=["POST"])
 @jwt_required()
 def create_saving():
-
-    data = validate_schema(
-        CreateSavingSchema,
-        request.get_json()
-    )
+    data = validate_schema(CreateSavingSchema, request.get_json())
 
     saving = SavingService.create_saving(data)
 
@@ -37,33 +33,29 @@ def create_saving():
             "amount": float(saving.amount),
             "date": saving.date.isoformat(),
             "description": saving.description,
+            "saving_type": saving.saving_type,
         },
-        status_code=201
+        status_code=201,
     )
-
 
 @saving_bp.route("", methods=["GET"])
 @jwt_required()
 def get_savings():
-
     savings = SavingService.get_all_savings()
 
-    data = []
-
-    for saving in savings:
-
-        data.append({
+    data = [
+        {
             "id": saving.id,
             "goal_id": saving.goal_id,
             "amount": float(saving.amount),
             "date": saving.date.isoformat(),
             "description": saving.description,
-        })
+            "saving_type": saving.saving_type,
+        }
+        for saving in savings
+    ]
 
-    return success_response(
-        data=data
-    )
-
+    return success_response(data=data)
 
 @saving_bp.route("/<int:saving_id>", methods=["GET"])
 @jwt_required()

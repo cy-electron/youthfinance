@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:youthfinance/features/goals/model/goal_provider.dart';
 
 import '../../../../core/theme/app_text_styles.dart';
@@ -25,20 +26,33 @@ class CompletedGoals extends ConsumerWidget {
 
         return ExpansionTile(
           tilePadding: EdgeInsets.zero,
+
           title: Text(
             'Completed Goals (${completedGoals.length})',
             style: AppTextStyles.sectionTitle,
           ),
+
           children: completedGoals.map((goal) {
             return ListTile(
               contentPadding: EdgeInsets.zero,
+
               leading: const Icon(Icons.check_circle),
+
               title: Text(goal.title),
-              subtitle: Text('₹${goal.currentAmount.toInt()} saved'),
+
+              subtitle: Text('₹${_formatAmount(goal.currentAmount)} saved'),
             );
           }).toList(),
         );
       },
     );
+  }
+
+  String _formatAmount(double amount) {
+    if (amount == amount.roundToDouble()) {
+      return amount.toInt().toString();
+    }
+
+    return amount.toStringAsFixed(2);
   }
 }

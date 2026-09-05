@@ -38,10 +38,6 @@ class _GoalsScreenState extends State<GoalsScreen> {
         onPressed: _showGoalActions,
         child: const Icon(Icons.add, color: Colors.white),
       ),
-
-      // ----------------------------------------------------------
-      // GOALS CONTENT
-      // ----------------------------------------------------------
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -159,7 +155,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
     // ----------------------------------------------------------
 
     if (action == 'cancel') {
-      await showModalBottomSheet<bool>(
+      final cancelled = await showModalBottomSheet<bool>(
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.white,
@@ -168,6 +164,17 @@ class _GoalsScreenState extends State<GoalsScreen> {
         ),
         builder: (_) => const CancelGoalSheet(),
       );
+
+      if (!mounted) return;
+
+      if (cancelled == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Goal cancelled successfully.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
 
       return;
     }
@@ -180,6 +187,92 @@ class _GoalsScreenState extends State<GoalsScreen> {
 
 class _GoalsHeader extends StatelessWidget {
   const _GoalsHeader();
+
+  void _showGoalsInfo(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.white,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              AppSpacing.lg,
+              AppSpacing.lg,
+              AppSpacing.xl,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.flag_outlined,
+                      color: AppColors.primary,
+                      size: 26,
+                    ),
+
+                    const SizedBox(width: AppSpacing.sm),
+
+                    Text(
+                      'How Goals Work',
+                      style: AppTextStyles.heading.copyWith(fontSize: 22),
+                    ),
+
+                    const Spacer(),
+
+                    IconButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: const Icon(Icons.close),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: AppSpacing.lg),
+
+                _GoalInfoItem(
+                  icon: Icons.add_circle_outline,
+                  title: 'Create a Goal',
+                  description:
+                      'Set a target amount and give your goal a name and category.',
+                ),
+
+                _GoalInfoItem(
+                  icon: Icons.savings_outlined,
+                  title: 'Add Money',
+                  description:
+                      'Use Add Money to move money from your available balance into a goal.',
+                ),
+
+                _GoalInfoItem(
+                  icon: Icons.trending_up,
+                  title: 'Track Progress',
+                  description:
+                      'Your goal balance and progress update as you add money.',
+                ),
+
+                _GoalInfoItem(
+                  icon: Icons.flag_outlined,
+                  title: 'Complete or Cancel',
+                  description:
+                      'Complete a goal when you reach your target. Cancel a goal if you no longer want to continue it.',
+                ),
+
+                const SizedBox(height: AppSpacing.sm),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -215,10 +308,64 @@ class _GoalsHeader extends StatelessWidget {
           iconColor: AppColors.textSecondary,
           borderColor: Colors.grey.shade300,
           onTap: () {
-            // Information sheet will be implemented next.
+            _showGoalsInfo(context);
           },
         ),
       ],
+    );
+  }
+}
+
+// ============================================================
+// GOAL INFO ITEM
+// ============================================================
+
+class _GoalInfoItem extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String description;
+
+  const _GoalInfoItem({
+    required this.icon,
+    required this.title,
+    required this.description,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: AppColors.primary, size: 22),
+
+          const SizedBox(width: AppSpacing.md),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: AppTextStyles.body.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+
+                const SizedBox(height: AppSpacing.xs),
+
+                Text(
+                  description,
+                  style: AppTextStyles.body.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -254,14 +401,10 @@ class _CircleIconButton extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         customBorder: const CircleBorder(),
-        child: const SizedBox(
+        child: SizedBox(
           width: 45,
           height: 45,
-          child: Icon(
-            Icons.info_outline,
-            color: AppColors.textSecondary,
-            size: 20,
-          ),
+          child: Icon(icon, color: iconColor, size: 20),
         ),
       ),
     );

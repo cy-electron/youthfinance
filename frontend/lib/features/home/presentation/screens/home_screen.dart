@@ -19,11 +19,13 @@ import '../../../notifications/model/notification_provider.dart';
 
 class HomeScreen extends ConsumerWidget {
   final VoidCallback onNavigateToTransactions;
+  final VoidCallback onNavigateToGoals;
   final VoidCallback onNavigateToInsights;
 
   const HomeScreen({
     super.key,
     required this.onNavigateToTransactions,
+    required this.onNavigateToGoals,
     required this.onNavigateToInsights,
   });
 
@@ -36,14 +38,20 @@ class HomeScreen extends ConsumerWidget {
         child: Column(
           children: [
             GreetingSection(
-              hasUnreadNotifications: unreadCount.valueOrNull != null &&
+              hasUnreadNotifications:
+                  unreadCount.valueOrNull != null &&
                   unreadCount.valueOrNull! > 0,
               onNotificationsTap: () => context.push('/notifications'),
             ),
 
             const SizedBox(height: AppSpacing.xl),
 
-            FinancialHealthCard(onNavigateToInsights: onNavigateToInsights),
+            Transform.translate(
+              offset: const Offset(-8, 0),
+              child: FinancialHealthCard(
+                onNavigateToInsights: onNavigateToInsights,
+              ),
+            ),
 
             const SizedBox(height: AppSpacing.xl),
 
@@ -55,13 +63,11 @@ class HomeScreen extends ConsumerWidget {
 
             const SizedBox(height: AppSpacing.xl),
 
-            const ActiveGoalsSection(),
+            ActiveGoalsSection(onNavigateToGoals: onNavigateToGoals),
 
             const SizedBox(height: AppSpacing.xl),
 
-            SmartInsightSection(
-              onNavigateToInsights: onNavigateToInsights,
-              ),
+            SmartInsightSection(onNavigateToInsights: onNavigateToInsights),
 
             const SizedBox(height: AppSpacing.xl),
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -29,9 +30,7 @@ class AnalyticsScreen extends StatelessWidget {
           children: [
             _InsightsHeader(
               onLearnTap: () {
-                // TODO: navigate to the Learn & Grow.
-                // Wire this up once the actual route/screen name for
-                // "Learn & Grow" is known.
+                context.go('/learning');
               },
             ),
 

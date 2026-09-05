@@ -6,7 +6,9 @@ import '../../../goals/model/goal_provider.dart';
 import '../../../goals/presentation/widgets/goal_card.dart';
 
 class ActiveGoalsSection extends ConsumerWidget {
-  const ActiveGoalsSection({super.key});
+  final VoidCallback? onNavigateToGoals;
+
+  const ActiveGoalsSection({super.key, this.onNavigateToGoals});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -18,17 +20,12 @@ class ActiveGoalsSection extends ConsumerWidget {
         SectionHeader(
           title: 'Active Goals',
           actionText: 'See All',
-          onPressed: () {
-            // TODO: Connect to Goals tab navigation.
-          },
+          onPressed: onNavigateToGoals,
         ),
 
         const SizedBox(height: 16),
 
         goalsAsync.when(
-          // --------------------------------------------------
-          // LOADING
-          // --------------------------------------------------
           loading: () {
             return const SizedBox(
               height: 160,
@@ -36,9 +33,6 @@ class ActiveGoalsSection extends ConsumerWidget {
             );
           },
 
-          // --------------------------------------------------
-          // ERROR
-          // --------------------------------------------------
           error: (error, stackTrace) {
             return _buildEmptyState(
               icon: Icons.error_outline_rounded,
@@ -46,18 +40,11 @@ class ActiveGoalsSection extends ConsumerWidget {
             );
           },
 
-          // --------------------------------------------------
-          // DATA
-          // --------------------------------------------------
           data: (goals) {
             final activeGoals = goals
                 .where((goal) => !goal.isCompleted)
                 .take(2)
                 .toList();
-
-            // ------------------------------------------------
-            // NO ACTIVE GOALS
-            // ------------------------------------------------
 
             if (activeGoals.isEmpty) {
               return _buildEmptyState(
@@ -65,10 +52,6 @@ class ActiveGoalsSection extends ConsumerWidget {
                 message: 'No active goals yet.',
               );
             }
-
-            // ------------------------------------------------
-            // ACTIVE GOALS
-            // ------------------------------------------------
 
             return Column(
               children: [
@@ -86,10 +69,6 @@ class ActiveGoalsSection extends ConsumerWidget {
     );
   }
 
-  // ------------------------------------------------------------
-  // EMPTY / ERROR STATE
-  // ------------------------------------------------------------
-
   Widget _buildEmptyState({required IconData icon, required String message}) {
     return Container(
       width: double.infinity,
@@ -102,9 +81,7 @@ class ActiveGoalsSection extends ConsumerWidget {
       child: Column(
         children: [
           Icon(icon, size: 32, color: Colors.grey.shade500),
-
           const SizedBox(height: 10),
-
           Text(message, textAlign: TextAlign.center),
         ],
       ),

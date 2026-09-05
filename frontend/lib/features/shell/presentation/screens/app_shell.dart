@@ -27,6 +27,13 @@ class _AppShellState extends State<AppShell> {
           currentIndex = 1;
         });
       },
+
+      onNavigateToGoals: () {
+        setState(() {
+          currentIndex = 2;
+        });
+      },
+
       onNavigateToInsights: () {
         setState(() {
           currentIndex = 3;
@@ -53,6 +60,7 @@ class _AppShellState extends State<AppShell> {
       // ========================================================
       bottomNavigationBar: NavigationBar(
         selectedIndex: currentIndex,
+
         onDestinationSelected: (index) {
           setState(() {
             currentIndex = index;

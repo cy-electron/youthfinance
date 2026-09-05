@@ -1,4 +1,6 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:youthfinance/features/analytics/data/financial_health_provider.dart';
 import 'package:youthfinance/features/analytics/presentation/screens/dashboard_provider.dart';
 import 'package:youthfinance/features/budget/budget_provider.dart';
@@ -7,7 +9,11 @@ import 'package:youthfinance/features/transactions/model/transaction_provider.da
 import 'package:youthfinance/features/emergency/model/emergency_fund_provider.dart';
 import 'package:youthfinance/features/investment/model/investment_provider.dart';
 import 'package:youthfinance/features/notifications/model/notification_provider.dart';
+import 'package:youthfinance/features/transactions/expense/expense_provider.dart';
+import 'package:youthfinance/features/transactions/income/income_provider.dart';
+import 'package:youthfinance/features/fun_fund/model/fun_fund_provider.dart';
 
+import '../../../core/storage/secure_storage.dart';
 import '../data/auth_models.dart';
 import '../data/auth_repository.dart';
 
@@ -25,7 +31,42 @@ class AuthNotifier extends StateNotifier<AsyncValue<UserModel?>> {
   final AuthRepository _repository;
 
   AuthNotifier(this._ref, this._repository)
-    : super(const AsyncValue.data(null));
+    : super(const AsyncValue.loading()) {
+    _restoreSession();
+  }
+
+  // ==========================================================
+  // Restore persisted session
+  // ==========================================================
+
+  Future<void> _restoreSession() async {
+    try {
+      final hasToken = await SecureStorage.hasAccessToken();
+
+      if (!hasToken) {
+        state = const AsyncValue.data(null);
+        return;
+      }
+
+      final user = await _repository.getProfile();
+
+      state = AsyncValue.data(user);
+    } on DioException catch (e, stackTrace) {
+      // Only remove the token when the backend explicitly tells us
+      // that authentication is invalid/expired.
+      if (e.response?.statusCode == 401) {
+        await SecureStorage.deleteAccessToken();
+        state = const AsyncValue.data(null);
+        return;
+      }
+
+      // Network/server/timeout errors should NOT destroy a valid session.
+      state = AsyncValue.error(e, stackTrace);
+    } catch (e, stackTrace) {
+      // Unexpected error: keep the token and expose the error.
+      state = AsyncValue.error(e, stackTrace);
+    }
+  }
 
   // ==========================================================
   // Login
@@ -105,9 +146,6 @@ class AuthNotifier extends StateNotifier<AsyncValue<UserModel?>> {
 
       state = AsyncValue.data(updatedUser);
     } catch (_) {
-      // The edit screen presents the request failure to the user. Keep the
-      // last successfully loaded profile available so a failed save does not
-      // make the Profile tab look as though the user has been signed out.
       rethrow;
     }
   }
@@ -122,11 +160,20 @@ class AuthNotifier extends StateNotifier<AsyncValue<UserModel?>> {
     // Clear all account-specific cached/provider data.
     _ref.invalidate(financialHealthProvider);
     _ref.invalidate(dashboardProvider);
+
     _ref.invalidate(budgetProvider);
     _ref.invalidate(goalProvider);
+
+    // Transactions are composed from these two providers.
+    _ref.invalidate(incomeProvider);
+    _ref.invalidate(expenseProvider);
     _ref.invalidate(transactionProvider);
+
     _ref.invalidate(emergencyFundProvider);
     _ref.invalidate(investmentProvider);
+
+    _ref.invalidate(funFundProvider);
+
     _ref.invalidate(notificationProvider);
     _ref.invalidate(unreadNotificationCountProvider);
     _ref.invalidate(notificationPreferenceProvider);

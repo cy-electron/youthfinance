@@ -7,14 +7,14 @@ class EmergencyFundRepository {
 
   Future<double> getBalance() async {
     final response = await _dio.get('/api/emergency');
+
     final data = response.data as Map<String, dynamic>;
-    return (data['data']['balance'] as num).toDouble();
+    final balance = data['data']['balance'];
+
+    return double.parse(balance.toString());
   }
 
-  Future<double> addMoney({
-    required double amount,
-    String? description,
-  }) async {
+  Future<double> addMoney({required double amount, String? description}) async {
     return _moveMoney('/api/emergency/add', amount, description);
   }
 
@@ -38,7 +38,10 @@ class EmergencyFundRepository {
           'description': description.trim(),
       },
     );
+
     final data = response.data as Map<String, dynamic>;
-    return (data['data']['balance'] as num).toDouble();
+    final balance = data['data']['balance'];
+
+    return double.parse(balance.toString());
   }
 }

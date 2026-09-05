@@ -86,6 +86,7 @@ class _AddGoalSavingSheetState extends ConsumerState<AddGoalSavingSheet> {
             description: _descriptionController.text.trim().isEmpty
                 ? null
                 : _descriptionController.text.trim(),
+            savingType: 'goal',
           );
 
       // Refresh goals so progress / saved amount updates immediately.

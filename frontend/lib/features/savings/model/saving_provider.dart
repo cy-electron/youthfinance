@@ -23,10 +23,18 @@ class SavingNotifier extends StateNotifier<AsyncValue<List<SavingModel>>> {
     try {
       final savings = await repository.getSavings();
 
+      if (!mounted) return;
+
       state = AsyncValue.data(savings);
     } catch (error, stackTrace) {
+      if (!mounted) return;
+
       state = AsyncValue.error(error, stackTrace);
     }
+  }
+
+  Future<void> refresh() async {
+    await loadSavings();
   }
 
   Future<void> addSaving({
@@ -34,12 +42,14 @@ class SavingNotifier extends StateNotifier<AsyncValue<List<SavingModel>>> {
     required double amount,
     required DateTime date,
     String? description,
+    required String savingType,
   }) async {
     await repository.createSaving(
       goalId: goalId,
       amount: amount,
       date: date,
       description: description,
+      savingType: savingType,
     );
 
     await loadSavings();
