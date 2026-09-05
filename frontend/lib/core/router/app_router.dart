@@ -6,6 +6,7 @@ import '../../features/auth/presentation/screens/signup_screen.dart';
 import '../../features/auth/providers/auth_provider.dart';
 import '../../features/shell/presentation/screens/app_shell.dart';
 import '../../features/splash/presentation/screens/splash_screen.dart';
+import '../../features/fun_fund/presentation/screens/fun_fund_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final router = GoRouter(
@@ -24,6 +25,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/dashboard',
         builder: (context, state) => const AppShell(),
+      ),
+
+      GoRoute(  
+        path: '/fun-fund',
+        builder: (context, state) => const FunFundScreen(),
       ),
     ],
   );

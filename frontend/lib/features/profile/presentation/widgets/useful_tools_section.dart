@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import 'useful_tools_chip.dart';
+
 
 class UsefulToolsSection extends StatelessWidget {
   const UsefulToolsSection({super.key});
@@ -52,9 +54,7 @@ class UsefulToolsSection extends StatelessWidget {
               UsefulToolsChip(
                 icon: Icons.celebration_outlined,
                 title: "Fun Fund",
-                onTap: () {
-                  // Fun Fund will be connected next.
-                },
+                onTap: () => context.push('/fun-fund'),
               ),
 
               const SizedBox(width: 8),

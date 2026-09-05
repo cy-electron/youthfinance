@@ -14,7 +14,11 @@ class ExpenseRepository {
     final data = responseData['data'] as List<dynamic>;
 
     return data
-        .map((item) => ExpenseModel.fromJson(item as Map<String, dynamic>))
+        .map(
+          (item) => ExpenseModel.fromJson(
+            item as Map<String, dynamic>,
+          ),
+        )
         .toList();
   }
 
@@ -23,7 +27,9 @@ class ExpenseRepository {
 
     final responseData = response.data as Map<String, dynamic>;
 
-    return ExpenseModel.fromJson(responseData['data'] as Map<String, dynamic>);
+    return ExpenseModel.fromJson(
+      responseData['data'] as Map<String, dynamic>,
+    );
   }
 
   Future<ExpenseModel> createExpense({
@@ -31,6 +37,8 @@ class ExpenseRepository {
     required double amount,
     required DateTime date,
     String? description,
+    String? sourceType,
+    int? sourceId,
   }) async {
     final response = await _dio.post(
       '/api/expense',
@@ -39,12 +47,16 @@ class ExpenseRepository {
         'amount': amount,
         'date': date.toIso8601String().split('T').first,
         'description': description,
+        'source_type': sourceType,
+        'source_id': sourceId,
       },
     );
 
-    final responseData = response.data as Map<String, dynamic>;
+    final responseData =
+        response.data as Map<String, dynamic>;
 
-    final id = (responseData['data']['id'] as num).toInt();
+    final id =
+        (responseData['data']['id'] as num).toInt();
 
     return ExpenseModel(
       id: id,
@@ -73,14 +85,18 @@ class ExpenseRepository {
     }
 
     if (date != null) {
-      data['date'] = date.toIso8601String().split('T').first;
+      data['date'] =
+          date.toIso8601String().split('T').first;
     }
 
     if (description != null) {
       data['description'] = description;
     }
 
-    await _dio.put('/api/expense/$id', data: data);
+    await _dio.put(
+      '/api/expense/$id',
+      data: data,
+    );
   }
 
   Future<void> deleteExpense(int id) async {

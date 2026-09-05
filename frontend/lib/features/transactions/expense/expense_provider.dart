@@ -9,8 +9,8 @@ final expenseRepositoryProvider = Provider<ExpenseRepository>((ref) {
 
 final expenseProvider =
     AsyncNotifierProvider<ExpenseNotifier, List<ExpenseModel>>(
-      ExpenseNotifier.new,
-    );
+  ExpenseNotifier.new,
+);
 
 class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
   @override
@@ -22,7 +22,8 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
     state = const AsyncValue.loading();
 
     try {
-      final expenses = await ref.read(expenseRepositoryProvider).getExpenses();
+      final expenses =
+          await ref.read(expenseRepositoryProvider).getExpenses();
 
       state = AsyncValue.data(expenses);
     } catch (error, stackTrace) {
@@ -35,6 +36,8 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
     required double amount,
     required DateTime date,
     String? description,
+    String? sourceType,
+    int? sourceId,
   }) async {
     final repository = ref.read(expenseRepositoryProvider);
 
@@ -43,6 +46,8 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
       amount: amount,
       date: date,
       description: description,
+      sourceType: sourceType,
+      sourceId: sourceId,
     );
 
     ref.invalidateSelf();
