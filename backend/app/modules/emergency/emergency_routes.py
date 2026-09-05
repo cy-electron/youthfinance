@@ -28,7 +28,7 @@ emergency_bp = Blueprint(
 @jwt_required()
 def get_emergency():
 
-    balance = EmergencyService.get_emergency_balance()
+    balance = EmergencyService.get_emergency_balance()  
 
     return success_response(
         data={
