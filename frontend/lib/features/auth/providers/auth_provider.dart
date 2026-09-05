@@ -4,6 +4,9 @@ import 'package:youthfinance/features/analytics/presentation/screens/dashboard_p
 import 'package:youthfinance/features/budget/budget_provider.dart';
 import 'package:youthfinance/features/goals/model/goal_provider.dart';
 import 'package:youthfinance/features/transactions/model/transaction_provider.dart';
+import 'package:youthfinance/features/emergency/model/emergency_fund_provider.dart';
+import 'package:youthfinance/features/investment/model/investment_provider.dart';
+import 'package:youthfinance/features/notifications/model/notification_provider.dart';
 
 import '../data/auth_models.dart';
 import '../data/auth_repository.dart';
@@ -101,8 +104,10 @@ class AuthNotifier extends StateNotifier<AsyncValue<UserModel?>> {
       );
 
       state = AsyncValue.data(updatedUser);
-    } catch (e, stackTrace) {
-      state = AsyncValue.error(e, stackTrace);
+    } catch (_) {
+      // The edit screen presents the request failure to the user. Keep the
+      // last successfully loaded profile available so a failed save does not
+      // make the Profile tab look as though the user has been signed out.
       rethrow;
     }
   }
@@ -120,6 +125,11 @@ class AuthNotifier extends StateNotifier<AsyncValue<UserModel?>> {
     _ref.invalidate(budgetProvider);
     _ref.invalidate(goalProvider);
     _ref.invalidate(transactionProvider);
+    _ref.invalidate(emergencyFundProvider);
+    _ref.invalidate(investmentProvider);
+    _ref.invalidate(notificationProvider);
+    _ref.invalidate(unreadNotificationCountProvider);
+    _ref.invalidate(notificationPreferenceProvider);
 
     // Finally clear authenticated user.
     state = const AsyncValue.data(null);

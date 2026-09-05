@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../design_system/cards/app_card.dart';
+import 'package:go_router/go_router.dart';
 
 class SupportSection extends StatelessWidget {
   const SupportSection({super.key});
@@ -18,21 +19,27 @@ class SupportSection extends StatelessWidget {
 
         AppCard(
           child: Column(
-            children: const [
+            children: [
               ListTile(
-                title: Text("Help Center"),
-                trailing: Icon(Icons.chevron_right),
+                title: const Text("Help Center"),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.push('/support'),
               ),
 
-              Divider(),
-
-              ListTile(title: Text("FAQ"), trailing: Icon(Icons.chevron_right)),
-
-              Divider(),
+              const Divider(),
 
               ListTile(
-                title: Text("Privacy Policy"),
-                trailing: Icon(Icons.chevron_right),
+                title: const Text("FAQ"),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.push('/support/faq'),
+              ),
+
+              const Divider(),
+
+              ListTile(
+                title: const Text("Privacy Policy"),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.push('/settings/privacy'),
               ),
             ],
           ),

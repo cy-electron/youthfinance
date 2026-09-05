@@ -7,6 +7,14 @@ import '../../features/auth/providers/auth_provider.dart';
 import '../../features/shell/presentation/screens/app_shell.dart';
 import '../../features/splash/presentation/screens/splash_screen.dart';
 import '../../features/fun_fund/presentation/screens/fun_fund_screen.dart';
+import '../../features/emergency/presentation/screens/emergency_fund_screen.dart';
+import '../../features/investment/presentation/screens/investment_screen.dart';
+import '../../features/notifications/presentation/screens/notification_screen.dart';
+import '../../features/profile/presentation/screens/appearance_screen.dart';
+import '../../features/profile/presentation/screens/notification_settings_screen.dart';
+import '../../features/profile/presentation/screens/privacy_policy_screen.dart';
+import '../../features/profile/presentation/screens/support_screen.dart';
+import '../../features/learning/presentation/screens/learning_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final router = GoRouter(
@@ -30,6 +38,51 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(  
         path: '/fun-fund',
         builder: (context, state) => const FunFundScreen(),
+      ),
+
+      GoRoute(
+        path: '/emergency-fund',
+        builder: (context, state) => const EmergencyFundScreen(),
+      ),
+
+      GoRoute(
+        path: '/investments',
+        builder: (context, state) => const InvestmentScreen(),
+      ),
+
+      GoRoute(
+        path: '/learning',
+        builder: (context, state) => const LearningScreen(),
+      ),
+
+      GoRoute(
+        path: '/notifications',
+        builder: (context, state) => const NotificationScreen(),
+      ),
+
+      GoRoute(
+        path: '/settings/appearance',
+        builder: (context, state) => const AppearanceScreen(),
+      ),
+
+      GoRoute(
+        path: '/settings/notifications',
+        builder: (context, state) => const NotificationSettingsScreen(),
+      ),
+
+      GoRoute(
+        path: '/settings/privacy',
+        builder: (context, state) => const PrivacyPolicyScreen(),
+      ),
+
+      GoRoute(
+        path: '/support',
+        builder: (context, state) => const SupportScreen(),
+      ),
+
+      GoRoute(
+        path: '/support/faq',
+        builder: (context, state) => const SupportScreen(showFaq: true),
       ),
     ],
   );

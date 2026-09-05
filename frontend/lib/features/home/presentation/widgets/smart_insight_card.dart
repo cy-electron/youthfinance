@@ -4,7 +4,12 @@ import '../../../../design_system/typography/section_header.dart';
 import 'insight_card.dart';
 
 class SmartInsightSection extends StatelessWidget {
-  const SmartInsightSection({super.key});
+  final VoidCallback onNavigateToInsights;
+
+  const SmartInsightSection({
+    super.key,
+    required this.onNavigateToInsights,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -19,9 +24,7 @@ class SmartInsightSection extends StatelessWidget {
           title: "Great Progress!",
           message:
               "You've spent 18% less on food this month compared to last month. Keep up the consistency!",
-          onTap: () {
-            // TODO: Navigate to Insights screen
-          },
+          onTap: onNavigateToInsights,
         ),
       ],
     );

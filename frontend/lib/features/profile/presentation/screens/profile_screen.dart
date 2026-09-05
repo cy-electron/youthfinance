@@ -6,7 +6,6 @@ import '../../../../design_system/layout/app_scaffold.dart';
 import '../widgets/profile_header.dart';
 import '../widgets/useful_tools_section.dart';
 import '../widgets/learning_card.dart';
-import '../widgets/interest_chips.dart';
 import '../widgets/settings_section.dart';
 import '../widgets/support_section.dart';
 import '../widgets/logout_button.dart';
@@ -39,9 +38,6 @@ class ProfileScreen extends StatelessWidget {
 
             SizedBox(height: AppSpacing.xl),
 
-            InterestChips(),
-
-            SizedBox(height: AppSpacing.xxl),
 
             SettingsSection(),
 

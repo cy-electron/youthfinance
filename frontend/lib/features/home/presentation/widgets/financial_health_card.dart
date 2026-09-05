@@ -32,7 +32,9 @@ class FinancialHealthCard extends ConsumerWidget {
         error: (error, stack) {
           return const SizedBox(
             height: 360,
-            child: Center(child: Text('Unable to load financial health')),
+            child: Center(
+              child: Text('Unable to load financial health'),
+            ),
           );
         },
 
@@ -74,7 +76,10 @@ class _FinancialHealthContent extends StatelessWidget {
           // ====================================================
           Row(
             children: [
-              Text("FINANCIAL HEALTH", style: AppTextStyles.sectionTitle),
+              Text(
+                "FINANCIAL HEALTH",
+                style: AppTextStyles.sectionTitle,
+              ),
 
               const SizedBox(width: 6),
 
@@ -104,9 +109,13 @@ class _FinancialHealthContent extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: AppColors.surface,
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AppColors.border),
+                    border: Border.all(
+                      color: AppColors.border,
+                    ),
                   ),
-                  child: const Icon(Icons.chevron_right),
+                  child: const Icon(
+                    Icons.chevron_right,
+                  ),
                 ),
               ),
             ],
@@ -127,8 +136,12 @@ class _FinancialHealthContent extends StatelessWidget {
                 animation: true,
                 animationDuration: 1200,
                 circularStrokeCap: CircularStrokeCap.round,
+
+                // Improved score color palette.
                 progressColor: _scoreColor(score),
-                backgroundColor: AppColors.primaryLight,
+
+                // Softer neutral background for the circle.
+                backgroundColor: const Color(0xFFE8EDF3),
 
                 center: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -164,8 +177,10 @@ class _FinancialHealthContent extends StatelessWidget {
                       _healthStatus(score),
                       style: AppTextStyles.cardTitle.copyWith(
                         color: _scoreColor(score),
-                        fontSize: 36,
+                        fontSize: 28,
                       ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
 
                     const SizedBox(height: AppSpacing.xs),
@@ -298,15 +313,19 @@ class _FinancialHealthContent extends StatelessWidget {
   // ==========================================================
 
   Color _scoreColor(double score) {
-    if (score >= 80) {
-      return AppColors.success;
+    if (score >= 75) {
+      return const Color(0xFF10B981); // Emerald - Excellent
     }
 
-    if (score >= 60) {
-      return const Color.fromARGB(255, 13, 100, 214);
+    if (score >= 55) {
+      return const Color(0xFF3B82F6); // Blue - Good
     }
 
-    return AppColors.expense;
+    if (score >= 25) {
+      return const Color(0xFFF59E0B); // Amber - Needs Attention
+    }
+
+    return const Color(0xFFEF4444); // Red - Critical
   }
 
   // ==========================================================

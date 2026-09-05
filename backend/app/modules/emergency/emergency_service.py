@@ -4,6 +4,7 @@ from flask_jwt_extended import get_jwt_identity
 
 from app.extensions import db
 from app.modules.money.money_service import MoneyService
+from app.modules.notification.notification_service import NotificationService
 
 
 class EmergencyService:
@@ -61,6 +62,10 @@ class EmergencyService:
                 description=description or "Added to emergency fund",
                 reference_type="emergency"
             )
+            NotificationService.create_emergency_fund_notification(
+                "Emergency Fund updated",
+                f"₹{amount:.2f} was added to your Emergency Fund.",
+            )
 
             db.session.commit()
 
@@ -99,6 +104,10 @@ class EmergencyService:
                 destination_type=MoneyService.GENERAL,
                 destination_id=None,
                 description=description or "Emergency fund money released"
+            )
+            NotificationService.create_emergency_fund_notification(
+                "Emergency Fund released",
+                f"₹{amount:.2f} was moved from your Emergency Fund to General.",
             )
 
             db.session.commit()

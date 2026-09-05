@@ -19,6 +19,7 @@ from app.modules.savings.savings_routes import saving_bp
 from app.modules.investment.investment_routes import investment_bp
 from app.modules.fun_fund.fun_fund_routes import fun_fund_bp
 from app.modules.emergency.emergency_routes import emergency_bp
+from app.modules.notification.notification_routes import notification_bp
 from app.extensions import (
     db,
     migrate,
@@ -46,6 +47,7 @@ def create_app():
     app.register_blueprint(investment_bp)
     app.register_blueprint(fun_fund_bp)
     app.register_blueprint(emergency_bp)
+    app.register_blueprint(notification_bp)
     app.register_blueprint(saving_bp)   
     app.register_blueprint(goal_bp)
     app.register_blueprint(dashboard_bp)

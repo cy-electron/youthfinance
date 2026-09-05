@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../design_system/cards/app_card.dart';
+import 'package:go_router/go_router.dart';
 
 class SettingsSection extends StatelessWidget {
   const SettingsSection({super.key});
@@ -18,35 +19,30 @@ class SettingsSection extends StatelessWidget {
 
         AppCard(
           child: Column(
-            children: const [
+            children: [
               ListTile(
                 leading: Icon(Icons.palette_outlined),
-                title: Text("Appearance"),
-                trailing: Icon(Icons.chevron_right),
+                title: const Text("Appearance"),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.push('/settings/appearance'),
               ),
 
-              Divider(),
+              const Divider(),
 
               ListTile(
                 leading: Icon(Icons.notifications_none),
-                title: Text("Notifications"),
-                trailing: Icon(Icons.chevron_right),
+                title: const Text("Notifications"),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.push('/settings/notifications'),
               ),
 
-              Divider(),
+              const Divider(),
 
               ListTile(
                 leading: Icon(Icons.lock_outline),
-                title: Text("Privacy & Security"),
-                trailing: Icon(Icons.chevron_right),
-              ),
-
-              Divider(),
-
-              ListTile(
-                leading: Icon(Icons.file_download_outlined),
-                title: Text("Export Data"),
-                trailing: Icon(Icons.chevron_right),
+                title: const Text("Privacy Policy"),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.push('/settings/privacy'),
               ),
             ],
           ),

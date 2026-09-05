@@ -62,9 +62,7 @@ class UsefulToolsSection extends StatelessWidget {
               UsefulToolsChip(
                 icon: Icons.savings_outlined,
                 title: "Emergency\nFund",
-                onTap: () {
-                  // Emergency Fund will be connected next.
-                },
+                onTap: () => context.push('/emergency-fund'),
               ),
 
               const SizedBox(width: 8),
@@ -72,7 +70,7 @@ class UsefulToolsSection extends StatelessWidget {
               UsefulToolsChip(
                 icon: Icons.trending_up_outlined,
                 title: "Investment",
-                onTap: () => _showComingSoon(context, "Investment"),
+                onTap: () => context.push('/investments'),
               ),
             ],
           ),

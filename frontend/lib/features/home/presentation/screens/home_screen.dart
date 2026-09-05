@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:youthfinance/core/theme/app_spacing.dart';
 
@@ -14,6 +15,7 @@ import 'package:youthfinance/features/transactions/presentation/widgets/recent_t
 import '../widgets/financial_health_card.dart';
 import '../widgets/greeting_section.dart';
 import '../../../../design_system/layout/app_scaffold.dart';
+import '../../../notifications/model/notification_provider.dart';
 
 class HomeScreen extends ConsumerWidget {
   final VoidCallback onNavigateToTransactions;
@@ -27,11 +29,17 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final unreadCount = ref.watch(unreadNotificationCountProvider);
+
     return AppScaffold(
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const GreetingSection(),
+            GreetingSection(
+              hasUnreadNotifications: unreadCount.valueOrNull != null &&
+                  unreadCount.valueOrNull! > 0,
+              onNotificationsTap: () => context.push('/notifications'),
+            ),
 
             const SizedBox(height: AppSpacing.xl),
 
@@ -51,7 +59,9 @@ class HomeScreen extends ConsumerWidget {
 
             const SizedBox(height: AppSpacing.xl),
 
-            const SmartInsightSection(),
+            SmartInsightSection(
+              onNavigateToInsights: onNavigateToInsights,
+              ),
 
             const SizedBox(height: AppSpacing.xl),
 

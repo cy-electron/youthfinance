@@ -5,3 +5,7 @@ from app.modules.budget.budget_model import Budget
 from app.modules.goal.goal_model import Goal
 from app.modules.savings.savings_model import Saving
 from app.modules.money.money_allocation_model import MoneyAllocation
+from app.modules.investment.investment_model import Investment
+from app.modules.fun_fund.fun_fund_model import FunFund
+from app.modules.notification.notification_model import Notification
+from app.modules.notification.notification_preference_model import NotificationPreference

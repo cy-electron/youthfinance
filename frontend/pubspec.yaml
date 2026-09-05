@@ -47,6 +47,9 @@ dependencies:
 
   # Cached Images
   cached_network_image: ^3.4.1
+  
+  # launch videos
+  url_launcher: ^6.3.2
 
   # Icons
   lucide_icons: ^0.257.0

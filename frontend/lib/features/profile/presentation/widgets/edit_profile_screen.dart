@@ -110,6 +110,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(authProvider).valueOrNull;
+    final genderOptions = [
+      ..._genders,
+      if (_selectedGender != null && !_genders.contains(_selectedGender))
+        _selectedGender!,
+    ];
 
     return Scaffold(
       appBar: AppBar(title: const Text('Edit Profile'), centerTitle: false),
@@ -243,7 +248,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   decoration: const InputDecoration(
                     prefixIcon: Icon(Icons.wc_outlined),
                   ),
-                  items: _genders.map((gender) {
+                  items: genderOptions.map((gender) {
                     return DropdownMenuItem(value: gender, child: Text(gender));
                   }).toList(),
                   onChanged: (value) {
