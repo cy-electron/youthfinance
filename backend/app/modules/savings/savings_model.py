@@ -32,6 +32,12 @@ class Saving(BaseModel):
         nullable=True
     )
 
+    saving_type = db.Column(
+        db.String(20),
+        nullable=False,
+        default="general"
+    )
+
     user = db.relationship(
         "User",
         backref=db.backref(
