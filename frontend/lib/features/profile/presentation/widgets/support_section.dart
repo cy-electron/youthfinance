@@ -34,13 +34,6 @@ class SupportSection extends StatelessWidget {
                 onTap: () => context.push('/support/faq'),
               ),
 
-              const Divider(),
-
-              ListTile(
-                title: const Text("Privacy Policy"),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => context.push('/settings/privacy'),
-              ),
             ],
           ),
         ),

@@ -23,7 +23,7 @@ class AppTextStyles {
     color: AppColors.textSecondary,
   );
 
-  static const cardTitle = TextStyle(
+  static const cardTitle = TextStyle(   
     fontSize: 18,
     fontWeight: FontWeight.bold,
     color: AppColors.textPrimary,

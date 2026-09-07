@@ -116,14 +116,14 @@ class QuickActionsSection extends StatelessWidget {
         onTap: () => _showManageBudget(context),
       ),
 
-      QuickActionModel(
-        title: "Planner",
-        icon: Icons.calendar_month_rounded,
-        color: AppColors.primary,
-        onTap: () {
-          // Coming next
-        },
-      ),
+      //QuickActionModel(
+        //title: "Planner",
+        //icon: Icons.calendar_month_rounded,
+       // color: AppColors.primary,
+        //onTap: () {
+        //  // Coming next
+       // },
+      //),
     ];
 
     return Column(

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-
 import 'package:go_router/go_router.dart';
+
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import 'useful_tools_chip.dart';
-
 
 class UsefulToolsSection extends StatelessWidget {
   const UsefulToolsSection({super.key});
@@ -35,7 +34,10 @@ class UsefulToolsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Useful tools", style: AppTextStyles.sectionTitle),
+        Text(
+          "Useful tools",
+          style: AppTextStyles.sectionTitle,
+        ),
 
         const SizedBox(height: AppSpacing.sm),
 
@@ -52,7 +54,7 @@ class UsefulToolsSection extends StatelessWidget {
               const SizedBox(width: 8),
 
               UsefulToolsChip(
-                icon: Icons.celebration_outlined,
+                icon: Icons.savings_rounded,
                 title: "Fun Fund",
                 onTap: () => context.push('/fun-fund'),
               ),
@@ -60,7 +62,7 @@ class UsefulToolsSection extends StatelessWidget {
               const SizedBox(width: 8),
 
               UsefulToolsChip(
-                icon: Icons.savings_outlined,
+                icon: Icons.shield_outlined,
                 title: "Emergency\nFund",
                 onTap: () => context.push('/emergency-fund'),
               ),

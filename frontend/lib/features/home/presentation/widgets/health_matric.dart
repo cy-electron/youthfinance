@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 
 class HealthMetric extends StatelessWidget {
@@ -8,6 +7,7 @@ class HealthMetric extends StatelessWidget {
   final String title;
   final String status;
   final double progress;
+  final Color color;
 
   const HealthMetric({
     super.key,
@@ -15,6 +15,7 @@ class HealthMetric extends StatelessWidget {
     required this.title,
     required this.status,
     required this.progress,
+    required this.color,
   });
 
   @override
@@ -25,39 +26,67 @@ class HealthMetric extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 22, color: AppColors.primary),
+          // Icon
+          SizedBox(
+            height: 24,
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Icon(
+                icon,
+                size: 22,
+                color: color,
+              ),
+            ),
+          ),
 
           const SizedBox(height: 8),
 
-          Text(
-            title,
-            style: AppTextStyles.caption,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-
-          const SizedBox(height: 2),
-
-          Text(
-            status,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-              color: AppColors.primary,
+          // Title
+          SizedBox(
+            height: 18,
+            child: Text(
+              title,
+              style: AppTextStyles.caption,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
           ),
 
-          const SizedBox(height: 10),
+          const SizedBox(height: 3),
 
-          ClipRRect(
-            borderRadius: BorderRadius.circular(100),
-            child: LinearProgressIndicator(
-              value: safeProgress,
-              minHeight: 6,
-              backgroundColor: const Color(0xffECECEC),
-              color: AppColors.primary,
+          // Fixed-height status area.
+          // Keeps all four indicators identical in height.
+          SizedBox(
+            height: 28,
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: Text(
+                status,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: color,
+                  height: 1.15,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 8),
+
+          // Progress bar
+          SizedBox(
+            height: 6,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(100),
+              child: LinearProgressIndicator(
+                value: safeProgress,
+                minHeight: 6,
+                backgroundColor: const Color(0xFFECECEC),
+                color: color,
+              ),
             ),
           ),
         ],
