@@ -387,45 +387,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                       ),
 
-                      // ------------------------------------------------
-                      // Forgot password
-                      // ------------------------------------------------
-
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: isLoading
-                              ? null
-                              : () {
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                        'Password recovery will be available soon.',
-                                      ),
-                                      behavior:
-                                          SnackBarBehavior.floating,
-                                    ),
-                                  );
-                                },
-                          style: TextButton.styleFrom(
-                            foregroundColor: _emeraldDark,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 4,
-                              vertical: 8,
-                            ),
-                          ),
-                          child: const Text(
-                            'Forgot password?',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 6),
+                      
+                      const SizedBox(height: 24),
 
                       // ------------------------------------------------
                       // Sign In

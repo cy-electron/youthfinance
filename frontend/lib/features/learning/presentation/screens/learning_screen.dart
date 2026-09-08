@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../widgets/learning_video_card.dart';
 import '../../data/learning_content.dart';
 import '../../model/learning_resource.dart';
@@ -77,8 +79,13 @@ class _LearningScreenState extends State<LearningScreen> {
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Lesson marked as completed.'),
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.primaryDark,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        content: const Text('Lesson marked as completed.'),
       ),
     );
   }
@@ -88,10 +95,13 @@ class _LearningScreenState extends State<LearningScreen> {
     if (_isLoading) {
       return Scaffold(
         appBar: AppBar(
-          title: Text('Learn'),
+          title: const Text('Learning Hub'),
+          elevation: 0,
         ),
         body: Center(
-          child: CircularProgressIndicator(),
+          child: CircularProgressIndicator(
+            color: AppColors.primary,
+          ),
         ),
       );
     }
@@ -115,7 +125,9 @@ class _LearningScreenState extends State<LearningScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Learn'),
+        title: const Text('Learning Hub'),
+        elevation: 0,
+        scrolledUnderElevation: 0,
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(
@@ -131,7 +143,9 @@ class _LearningScreenState extends State<LearningScreen> {
                 .textTheme
                 .headlineSmall
                 ?.copyWith(
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.4,
+                  height: 1.2,
                 ),
           ),
 
@@ -140,7 +154,10 @@ class _LearningScreenState extends State<LearningScreen> {
           Text(
             'Simple, practical videos to help you '
             'make better financial decisions.',
-            style: Theme.of(context).textTheme.bodyLarge,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: Colors.black54,
+                  height: 1.35,
+                ),
           ),
 
           const SizedBox(height: AppSpacing.lg),
@@ -154,18 +171,13 @@ class _LearningScreenState extends State<LearningScreen> {
 
           Text(
             'Topics',
-            style: Theme.of(context)
-                .textTheme
-                .titleLarge
-                ?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+            style: AppTextStyles.sectionTitle,
           ),
 
           const SizedBox(height: AppSpacing.sm),
 
           SizedBox(
-            height: 44,
+            height: 40,
             child: ListView(
               scrollDirection: Axis.horizontal,
               children: [
@@ -173,10 +185,10 @@ class _LearningScreenState extends State<LearningScreen> {
                   padding: const EdgeInsets.only(
                     right: AppSpacing.sm,
                   ),
-                  child: ChoiceChip(
-                    label: const Text('All'),
+                  child: _TopicChip(
+                    label: 'All',
                     selected: _selectedTopic == null,
-                    onSelected: (_) {
+                    onTap: () {
                       setState(() {
                         _selectedTopic = null;
                       });
@@ -188,10 +200,10 @@ class _LearningScreenState extends State<LearningScreen> {
                     padding: const EdgeInsets.only(
                       right: AppSpacing.sm,
                     ),
-                    child: ChoiceChip(
-                      label: Text(topic),
+                    child: _TopicChip(
+                      label: topic,
                       selected: _selectedTopic == topic,
-                      onSelected: (_) {
+                      onTap: () {
                         setState(() {
                           _selectedTopic = topic;
                         });
@@ -212,12 +224,7 @@ class _LearningScreenState extends State<LearningScreen> {
               ),
               child: Text(
                 _selectedTopic!,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleLarge
-                    ?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
+                style: AppTextStyles.sectionTitle,
               ),
             ),
 
@@ -235,6 +242,12 @@ class _LearningScreenState extends State<LearningScreen> {
   }
 }
 
+// ============================================================
+// Progress card — a stat card, not a generic Material Card.
+// A ring makes "3 of 12 done" legible at a glance; the text
+// version alone made you do the division yourself.
+// ============================================================
+
 class _ProgressCard extends StatelessWidget {
   final int completed;
   final int total;
@@ -248,35 +261,135 @@ class _ProgressCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final progress =
         total == 0 ? 0.0 : completed / total;
+    final percent = (progress * 100).round();
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Your learning',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(
-                    fontWeight: FontWeight.w600,
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: AppColors.primaryLight,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.12),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 56,
+            height: 56,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                SizedBox(
+                  width: 56,
+                  height: 56,
+                  child: CircularProgressIndicator(
+                    value: progress,
+                    strokeWidth: 5,
+                    backgroundColor:
+                        AppColors.primary.withOpacity(0.15),
+                    valueColor: AlwaysStoppedAnimation(
+                      AppColors.primaryDark,
+                    ),
                   ),
+                ),
+                Text(
+                  '$percent%',
+                  style: AppTextStyles.body.copyWith(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primaryDark,
+                  ),
+                ),
+              ],
             ),
+          ),
 
-            const SizedBox(height: AppSpacing.xs),
+          const SizedBox(width: AppSpacing.md),
 
-            Text(
-              '$completed of $total lessons completed',
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Your learning journey',
+                  style: AppTextStyles.body.copyWith(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '$completed of $total lessons completed',
+                  style: AppTextStyles.body.copyWith(
+                    fontSize: 12.5,
+                    color: Colors.black54,
+                  ),
+                ),
+              ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
-            const SizedBox(height: AppSpacing.sm),
+// ============================================================
+// Topic chip — filled emerald when selected, hairline outline
+// on cream when not. Replaces the default ChoiceChip so topic
+// filters look like part of this app instead of stock Material.
+// ============================================================
 
-            LinearProgressIndicator(
-              value: progress,
+class _TopicChip extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _TopicChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeOut,
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 9,
+          ),
+          decoration: BoxDecoration(
+            color: selected ? AppColors.primaryDark : Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: selected
+                  ? Colors.transparent
+                  : AppColors.primary.withOpacity(0.25),
+              width: 1,
             ),
-          ],
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            label,
+            style: AppTextStyles.body.copyWith(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: selected ? Colors.white : AppColors.primaryDark,
+            ),
+          ),
         ),
       ),
     );

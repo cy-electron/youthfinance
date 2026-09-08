@@ -60,12 +60,12 @@ class _LearningCardState extends State<LearningCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "Continue Learning",
-            style: AppTextStyles.sectionTitle,
-          ),
+          //Text(
+            //"Continue Learning",
+           // style: AppTextStyles.sectionTitle,
+          //),
 
-          const SizedBox(height: AppSpacing.lg),
+         // const SizedBox(height: AppSpacing.lg),
 
           Row(
             children: [

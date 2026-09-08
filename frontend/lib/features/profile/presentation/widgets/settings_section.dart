@@ -13,7 +13,7 @@ class SettingsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("  Settings", style: AppTextStyles.sectionTitle),
+        Text("  SETTINGS", style: AppTextStyles.sectionTitle),
 
         const SizedBox(height: AppSpacing.sm),
 

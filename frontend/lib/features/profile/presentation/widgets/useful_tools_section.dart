@@ -35,7 +35,7 @@ class UsefulToolsSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Useful tools",
+          "USEFULL TOOLS",
           style: AppTextStyles.sectionTitle,
         ),
 
@@ -45,13 +45,13 @@ class UsefulToolsSection extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           child: Row(
             children: [
-              UsefulToolsChip(
-                icon: Icons.import_export,
-                title: "Import data",
-                onTap: () => _showComingSoon(context, "Import Data"),
-              ),
+              //UsefulToolsChip(
+               //icon: Icons.import_export,
+                //title: "Import data",
+                //onTap: () => _showComingSoon(context, "Import Data"),
+              //),
 
-              const SizedBox(width: 8),
+              //const SizedBox(width: 8),
 
               UsefulToolsChip(
                 icon: Icons.savings_rounded,

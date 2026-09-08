@@ -18,15 +18,7 @@ class ProfileHeader extends ConsumerWidget {
       // ========================================================
       // Loading
       // ========================================================
-      loading: () {
-        return const Row(
-          children: [
-            CircleAvatar(radius: 34, child: CircularProgressIndicator()),
-            SizedBox(width: AppSpacing.lg),
-            Text("Loading profile..."),
-          ],
-        );
-      },
+      loading: () => const _ProfileHeaderSkeleton(),
 
       // ========================================================
       // Error
@@ -34,7 +26,26 @@ class ProfileHeader extends ConsumerWidget {
       error: (error, stackTrace) {
         return Row(
           children: [
-            const CircleAvatar(radius: 34, child: Icon(Icons.person_outline)),
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppColors.primaryLight,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withOpacity(0.14),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Icon(
+                Icons.person_outline_rounded,
+                color: AppColors.primary,
+                size: 20,
+              ),
+            ),
             const SizedBox(width: AppSpacing.lg),
             Expanded(
               child: Text(
@@ -53,7 +64,26 @@ class ProfileHeader extends ConsumerWidget {
         if (user == null) {
           return Row(
             children: [
-              const CircleAvatar(radius: 32, child: Icon(Icons.person_outline)),
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryLight,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withOpacity(0.14),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.person_outline_rounded,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
+              ),
               const SizedBox(width: AppSpacing.lg),
               Text("Guest", style: AppTextStyles.heading),
             ],
@@ -61,6 +91,7 @@ class ProfileHeader extends ConsumerWidget {
         }
 
         return Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // ==================================================
             // Initials Avatar
@@ -75,23 +106,38 @@ class ProfileHeader extends ConsumerWidget {
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     user.fullName,
-                    style: AppTextStyles.heading,
+                    style: AppTextStyles.heading.copyWith(
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.3,
+                      height: 1.15,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
 
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 4),
 
-                  Text(
-                    _profileSubtitle(user),
-                    style: AppTextStyles.body.copyWith(
-                      color: AppColors.primary,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          _profileSubtitle(user),
+                          style: AppTextStyles.body.copyWith(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                            letterSpacing: 0.1,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -102,22 +148,14 @@ class ProfileHeader extends ConsumerWidget {
             // ==================================================
             // Edit Profile
             // ==================================================
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                shape: BoxShape.circle,
-              ),
-              child: IconButton(
-                tooltip: "Edit profile",
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const EditProfileScreen(),
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.edit_outlined),
-              ),
+            _EditProfileButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const EditProfileScreen(),
+                  ),
+                );
+              },
             ),
           ],
         );
@@ -139,7 +177,10 @@ class ProfileHeader extends ConsumerWidget {
 }
 
 // ============================================================
-// Initials Avatar
+// Initials Avatar — light mint fill, emerald text (your existing
+// color concept), just tighter and smaller. Separation from the
+// cream background comes from a soft, tinted shadow — not a ring
+// or border, which read as a badge rather than an avatar.
 // ============================================================
 
 class _InitialsAvatar extends StatelessWidget {
@@ -149,15 +190,29 @@ class _InitialsAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CircleAvatar(
-      radius: 34,
-      backgroundColor: AppColors.primaryLight,
+    return Container(
+      width: 55,
+      height: 55,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: AppColors.primaryLight,
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.16),
+            blurRadius: 3,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      alignment: Alignment.center,
       child: Text(
         _getInitials(fullName),
         style: AppTextStyles.cardTitle.copyWith(
           color: AppColors.primary,
-          fontSize: 22,
+          fontSize: 20,
           fontWeight: FontWeight.w700,
+          letterSpacing: 0.2,
+          height: 1,
         ),
       ),
     );
@@ -186,5 +241,125 @@ class _InitialsAvatar extends StatelessWidget {
 
     return (parts.first.substring(0, 1) + parts.last.substring(0, 1))
         .toUpperCase();
+  }
+}
+
+// ============================================================
+// Edit Profile Button — restrained, hairline outline, no fill.
+// A financial product shouldn't have a loud, filled action
+// button competing with the identity block next to it.
+// ============================================================
+
+class _EditProfileButton extends StatelessWidget {
+  final VoidCallback onPressed;
+
+  const _EditProfileButton({required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      shape: const CircleBorder(),
+      child: InkWell(
+        onTap: onPressed,
+        customBorder: const CircleBorder(),
+        splashColor: AppColors.primaryDark.withOpacity(0.08),
+        highlightColor: AppColors.primaryDark.withOpacity(0.04),
+        child: Container(
+          width: 36,
+          height: 36,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: AppColors.primaryDark.withOpacity(0.20),
+              width: 1,
+            ),
+          ),
+          child: Icon(
+            Icons.edit_outlined,
+            size: 16,
+            color: AppColors.primaryDark.withOpacity(0.75),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ============================================================
+// Loading Skeleton — shimmer-style placeholder, no spinner
+// ============================================================
+
+class _ProfileHeaderSkeleton extends StatefulWidget {
+  const _ProfileHeaderSkeleton();
+
+  @override
+  State<_ProfileHeaderSkeleton> createState() =>
+      _ProfileHeaderSkeletonState();
+}
+
+class _ProfileHeaderSkeletonState extends State<_ProfileHeaderSkeleton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1400),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        // Slow, subtle pulse — not a shiny sweep. Reads as
+        // "content is settling in", not a game loading screen.
+        final opacity = 0.10 + 0.08 * (1 - (_controller.value - 0.5).abs() * 2);
+        return Row(
+          children: [
+            _shimmerBox(width: 60, height: 60, radius: 30, opacity: opacity),
+            const SizedBox(width: AppSpacing.lg),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _shimmerBox(width: 130, height: 14, radius: 4, opacity: opacity),
+                  const SizedBox(height: 8),
+                  _shimmerBox(width: 84, height: 11, radius: 4, opacity: opacity),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _shimmerBox({
+    required double width,
+    required double height,
+    required double radius,
+    required double opacity,
+  }) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: AppColors.primaryDark.withOpacity(opacity),
+        borderRadius: BorderRadius.circular(radius),
+      ),
+    );
   }
 }

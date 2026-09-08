@@ -13,7 +13,7 @@ class SupportSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("  Support", style: AppTextStyles.sectionTitle),
+        Text("  SUPORT", style: AppTextStyles.sectionTitle),
 
         const SizedBox(height: AppSpacing.sm),
 
